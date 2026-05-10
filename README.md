@@ -106,4 +106,4 @@ cloud-security-homelab/
 
 ## Why this exists
 
-This repo started as interview prep for a Cloud Security Engineer role and grew into a learning sandbox. The end goal is fluency, not certification — when you walk a panel through what's in this repo, you should be able to talk about *why* each layer exists, what it would catch, what it wouldn't, and what you'd do differently in a real production environment. Every doc is written with that in mind.
+This repo is a learning sandbox for cloud-native security at the intersection of Kubernetes, object storage, and detection-and-response. The goal is fluency through hands-on work — being able to articulate *why* each layer exists, what it would catch, what it wouldn't, and what would be different in a real production environment. Every doc is written with that in mind.

@@ -4,7 +4,7 @@
 
 **Time budget:** 1.5 hours.
 
-**Note on scope:** the original phase 06 included swapping the k3s default CNI (Flannel) for Cilium and adding Hubble for observability. That's a destructive change requiring a cluster reset, which is unacceptable risk this close to your interview. You're doing the *lite* version: NetworkPolicy with the default CNI. You can talk about Cilium and eBPF networking in the panel without having migrated to it.
+**Note on scope:** the original phase 06 included swapping the k3s default CNI (Flannel) for Cilium and adding Hubble for observability. That's a destructive change requiring a cluster reset, which is out of scope here. This is the *lite* version: NetworkPolicy with the default CNI. The Cilium / eBPF / Hubble story can be described in terms of capabilities even without having migrated to it.
 
 **You will end up with:**
 - A `default-deny` NetworkPolicy applied to the `storage` namespace
@@ -200,12 +200,12 @@ This is more important than the cross-namespace test. It demonstrates that even 
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I implemented default-deny NetworkPolicy in my storage namespace and explicitly allowed only the flows the application requires — Nextcloud to Postgres, Nextcloud to MinIO, and Ingress to Nextcloud. Anything else is dropped."
-- "NetworkPolicy is L3/L4. For L7 controls I'd add a service mesh — Istio or Linkerd — or move to Cilium and use its L7 policies, which leverage eBPF."
-- "I tested by negative — proving a non-Nextcloud pod can't reach MinIO confirms the policy is enforcing, not just present."
-- "I know the trap with Flannel — it doesn't enforce NetworkPolicy on its own. k3s ships with a companion enforcer, but you can't assume that on every cluster."
+- Default-deny NetworkPolicy in the storage namespace, with explicit allows for only the flows the application requires — Nextcloud to Postgres, Nextcloud to MinIO, Ingress to Nextcloud. Everything else is dropped.
+- NetworkPolicy is L3/L4. L7 controls require a service mesh (Istio, Linkerd) or moving to Cilium and using its L7 policies, which leverage eBPF.
+- Tested by negative — proving a non-Nextcloud pod *can't* reach MinIO confirms the policy is enforcing, not just present.
+- Flannel gotcha: it doesn't enforce NetworkPolicy on its own. k3s ships with a companion enforcer, but this can't be assumed on every cluster.
 
 ## Next
 

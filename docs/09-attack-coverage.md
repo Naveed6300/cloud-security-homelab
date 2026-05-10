@@ -4,7 +4,7 @@
 
 **Time budget:** 1.5 hours.
 
-**Why this exists:** the JD specifically calls out "mapping system defenses and monitoring capabilities against threat frameworks like MITRE ATT&CK and OWASP." A filled-in coverage matrix is one of the highest-signal artifacts you can bring to a panel because it shows you don't just install tools — you reason about what they catch.
+**Why this exists:** mapping system defenses against threat frameworks like MITRE ATT&CK and OWASP is a core security engineering practice. A filled-in coverage matrix is a high-signal artifact because it forces reasoning about what each tool catches, rather than treating tool count as a proxy for coverage.
 
 **You will end up with:**
 - A coverage matrix in `docs/09-attack-coverage.md` (this file becomes the deliverable)
@@ -26,14 +26,14 @@ Several "matrices" exist for different domains. Cloud-relevant ones:
 
 ### Why coverage matters more than count
 
-It's tempting to claim coverage by tool count: "I run Falco, GuardDuty, CloudTrail — I have detection." Panels probe deeper. A coverage matrix forces you to answer:
+It's tempting to claim coverage by tool count: "I run Falco, GuardDuty, CloudTrail — I have detection." That's a shallow answer. A coverage matrix forces deeper questions:
 
 - Which specific techniques can each tool detect?
 - What's the signal? (rule name, log field, alert type)
 - What's the *quality* of the detection? Reliable, partial, or theoretical?
 - Where are the gaps?
 
-That's the conversation panels actually want to have.
+That's the actual conversation worth having about detection coverage.
 
 ### Coverage scoring model
 
@@ -50,7 +50,7 @@ This shows nuance without overcomplicating. Avoid percentage-based "coverage" cl
 
 ## How to use this matrix
 
-This file is meant to live in your repo as a reference and an artifact. Update it as your lab evolves. For the interview, print or have it open during the panel; reference specific cells when answering technique-related questions.
+This file lives in the repo as a reference and an artifact. Update it as the lab evolves. Specific cells are easier to discuss than aggregate scores when reasoning about technique-by-technique coverage.
 
 ---
 
@@ -81,7 +81,7 @@ This file is meant to live in your repo as a reference and an artifact. Update i
 
 ## Gaps and roadmap
 
-The matrix above shows where you're light. Three gaps worth flagging in the panel:
+The matrix above shows where coverage is light. Three gaps worth highlighting:
 
 1. **T1552.005 (Instance Metadata API abuse)** — In a real cloud environment with EC2, this is critical. Mitigation: enforce IMDSv2 via SCP. Detection: VPC flow logs into Athena queries looking for unusual 169.254.169.254 access patterns. **Action**: add to roadmap.
 
@@ -91,21 +91,21 @@ The matrix above shows where you're light. Three gaps worth flagging in the pane
 
 ---
 
-## How to talk about this in an interview
+## Articulating the matrix
 
-When asked "how do you map detection to threats?" — pull up this matrix and walk through it. Specific cells matter more than aggregate scores:
+When reasoning through detection-to-threat mapping, specific cells matter more than aggregate scores. A few examples:
 
-- "T1098.001 — adding cloud credentials — I detect via CloudTrail's `CreateAccessKey` event. In production I'd add a CloudWatch alarm scoped to non-pipeline identities."
-- "T1611 — container escape — I cover at two layers: OPA Gatekeeper blocks privileged containers at admission, and Falco's privileged-container rule fires at runtime in case anything slipped through."
-- "T1552.005 — IMDS abuse — that's a gap in my lab. I know the detection pattern: VPC flow logs filtered to 169.254.169.254 with anomaly detection on volume. Mitigation is enforcing IMDSv2 via SCP."
+- T1098.001 (adding cloud credentials) — detected via CloudTrail's `CreateAccessKey` event. Production hardening: CloudWatch alarm scoped to non-pipeline identities.
+- T1611 (container escape) — covered at two layers: OPA Gatekeeper blocks privileged containers at admission, Falco's privileged-container rule fires at runtime if anything slipped through.
+- T1552.005 (IMDS abuse) — a current gap. Detection pattern: VPC flow logs filtered to 169.254.169.254 with anomaly detection on volume. Mitigation: enforce IMDSv2 via SCP.
 
-Showing where you have gaps is *more* convincing than claiming full coverage. Real coverage is never 100%; engineers who claim it is haven't thought hard enough.
+Clearly identifying gaps is more honest than claiming full coverage. Real coverage is never 100% — frameworks evolve, environments drift, and new techniques emerge.
 
 ---
 
 ## OWASP Cloud-Native Top 10 — quick map
 
-The JD also references OWASP. Be ready to one-line each:
+OWASP Cloud-Native Top 10 maps cleanly onto the work in this lab — a one-line summary per item:
 
 - **CNAS-1** Insecure cloud, container, or orchestration configuration → covered by Phase 04 Gatekeeper, Phase 07 kube-bench, Phase 08 Prowler
 - **CNAS-2** Injection flaws → application-level, not directly addressed in this lab
@@ -126,7 +126,7 @@ The JD also references OWASP. Be ready to one-line each:
 - [ ] Each row identifies signal/source
 - [ ] At least 3 gaps clearly identified with actions
 - [ ] OWASP Cloud-Native Top 10 mapped to phase work
-- [ ] You can verbally walk through any cell in the matrix
+- [ ] Any cell in the matrix can be explained in detail (signal, source, gap rationale)
 
 ## Next
 

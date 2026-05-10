@@ -4,7 +4,7 @@
 
 **Time budget:** 3 hours. The Falco install is fast; the Security Onion integration takes the most time.
 
-**Why this is the highest-leverage interview phase you'll do:** runtime detection is what closes the loop on cloud security. You can scan an image (phase 04) and you can block bad pod specs at admission (phase 04). Neither catches a *running* container that suddenly spawns a shell, reads `/etc/shadow`, or reaches out to a malicious IP. Falco does. And shipping those alerts to Security Onion gives you a single pane of glass across network, endpoint, and container — exactly the multi-layer detection narrative panels love.
+**Why this matters:** runtime detection closes the loop on cloud security. You can scan an image (phase 04) and you can block bad pod specs at admission (phase 04). Neither catches a *running* container that suddenly spawns a shell, reads `/etc/shadow`, or reaches out to a malicious IP. Falco does. And shipping alerts to Security Onion gives a single pane of glass across network, endpoint, and container — the multi-layer detection model.
 
 **You will end up with:**
 - Falco running as a DaemonSet on every node, watching syscalls
@@ -115,7 +115,7 @@ Open `http://localhost:2802` in a browser. You'll see an empty alert feed. Keep 
 
 ## Step 3 — Generate three detections
 
-Each of these maps to a default Falco rule. The point is to feel what triggers what — and to save evidence for the interview.
+Each of these maps to a default Falco rule. The point is to feel what triggers what, and to save evidence of working detections.
 
 ### Detection 1 — "Terminal shell in container"
 
@@ -135,7 +135,7 @@ $ kubectl exec -it shellme -- sh
 
 In the Falcosidekick UI, you should see an alert: **"A shell was spawned in a container with an attached terminal"** at NOTICE severity. The alert payload includes the container ID, image, command (`sh`), user, and the parent process (your kubectl-exec).
 
-Save the JSON payload to `scans/falco-shell-alert.json`. You'll reference this in the panel.
+Save the JSON payload to `scans/falco-shell-alert.json` as detection evidence.
 
 ### Detection 2 — "Sensitive file read"
 
@@ -228,7 +228,7 @@ $ kubectl exec -it cred-test -- sh
 # alert fires
 ```
 
-Save the alert JSON to `scans/falco-custom-rule-cred.json`. You now have a custom rule mapped to a specific ATT&CK technique — that's the kind of artifact panels remember.
+Save the alert JSON to `scans/falco-custom-rule-cred.json`. You now have a custom rule mapped to a specific ATT&CK technique, demonstrating the threat-model-to-detection pipeline.
 
 ---
 
@@ -289,7 +289,7 @@ If Kibana doesn't have a `falco-events-*` index pattern, create one in Stack Man
 
 ## Step 6 — Build a saved search and a basic dashboard in Kibana
 
-This is what makes the artifact "interview-ready" instead of "I sent some logs to a tool."
+This is what makes the deliverable production-shaped rather than just "I sent some logs to a tool."
 
 In Kibana:
 
@@ -334,12 +334,12 @@ In Kibana:
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I ran Falco as a DaemonSet on a 3-node k3s cluster, capturing syscalls via eBPF. I triggered detections for shell-in-container, sensitive file reads, and outbound network activity, and forwarded them to Security Onion via Falcosidekick where I built a Kibana dashboard for triage."
-- "I wrote custom Falco rules tied to my environment — including one mapped to MITRE ATT&CK T1552.001 for credential file access in containers."
-- "I understand the difference between detection and prevention. Falco is a detection tool; preventing the behavior would mean integrating with admission control or a runtime enforcement tool. In my environment I chose detection because false-positive cost is lower than false-negative cost in a multi-tenant cluster."
-- "I built a multi-layer detection pipeline: container runtime (Falco), network IDS (Suricata via Security Onion), endpoint telemetry (Sysmon via Elastic Agent on Windows endpoints), and Zeek for network metadata. Everything terminates in the same Kibana so analysts get one pane of glass."
+- Falco runs as a DaemonSet on a 3-node k3s cluster, capturing syscalls via eBPF. Detections fire for shell-in-container, sensitive file reads, and outbound network activity. Alerts forward to Security Onion via Falcosidekick, where a Kibana dashboard supports triage.
+- Custom Falco rules tie to environment-specific threat models — including one mapped to MITRE ATT&CK T1552.001 for credential file access in containers.
+- Detection vs prevention: Falco is a detection tool; preventing the behavior would require integration with admission control or a runtime enforcement tool. Detection is the right default in a multi-tenant cluster — false-positive cost (operational drag) is lower than false-negative cost (missed compromise).
+- Multi-layer detection pipeline: container runtime (Falco), network IDS (Suricata via Security Onion), endpoint telemetry (Sysmon via Elastic Agent on Windows endpoints), and Zeek for network metadata. Everything terminates in the same Kibana for unified triage.
 
 ## Next
 

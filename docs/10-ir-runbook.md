@@ -4,7 +4,7 @@
 
 **Time budget:** 1 hour to write, plus a tabletop walk-through.
 
-**Why this exists:** the JD calls out "developing and maintaining cloud incident response runbooks." Most candidates can talk about generic IR phases (prepare → detect → contain → eradicate → recover → learn). Few can walk a panel through a specific runbook with the actual commands. That's the bar this doc clears.
+**Why this exists:** "Developing and maintaining cloud incident response runbooks" is core security engineering work. Most security writeups stay at the level of generic IR phases (prepare → detect → contain → eradicate → recover → learn). A specific runbook with actual commands and decision points is what closes the gap between framework and execution.
 
 **Scenario picked:** T1552.001 — Credentials in Files, fired by your custom Falco rule from Phase 05 (`Cloud credential file read`). This is one of the most realistic post-exploitation moves in cloud and you have the detection wired already.
 
@@ -355,7 +355,7 @@ A short doc with:
 - What didn't
 - Action items, each with an owner and due date
 
-Save it. Even a homelab postmortem is something to point at in an interview.
+Save it. Postmortem writeups are valuable artifacts regardless of context — they document learning and force concrete improvements.
 
 ### 5.2 Tune detections
 
@@ -372,7 +372,7 @@ Whatever surprised you during response — add it to the runbook. Runbooks live 
 
 ---
 
-## Tabletop exercise (do this before your interview)
+## Tabletop exercise
 
 Walk through this runbook by simulating a detection in your own lab:
 
@@ -382,24 +382,22 @@ Walk through this runbook by simulating a detection in your own lab:
 4. Time each phase
 5. Note where you stalled or guessed
 
-Write up the tabletop as `scans/ir-tabletop.md`. This is the artifact you point at when an interviewer asks "have you actually run a runbook end to end?" — yes, in a controlled environment, here's the writeup.
+Write up the tabletop as `scans/ir-tabletop.md`. This is the artifact that proves the runbook has been exercised — "yes, this has been run end-to-end in a controlled environment" — rather than being aspirational documentation.
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I have a written runbook for one of my Falco detections — credential file read in a container, ATT&CK T1552.001. It walks an analyst from alert through containment, eradication, recovery, and postmortem with concrete commands at each step."
-- "Containment before eradication. I quarantine via NetworkPolicy first to preserve the pod for forensics, capture evidence, then delete and patch."
-- "The first thing I do on this alert isn't kill the pod — it's rotate the credentials that may have been read. Killing the pod doesn't help if the attacker already has the keys."
-- "I tabletop my runbooks. There's a writeup of the dry run with timing for each phase."
-- "Postmortems are mandatory, even for non-incidents. Each incident should produce updates to the runbook so the next response is faster."
+- A written runbook for a specific Falco detection — credential file read in a container, ATT&CK T1552.001. Walks an analyst from alert through containment, eradication, recovery, and postmortem with concrete commands at each step.
+- Containment before eradication. Quarantine via NetworkPolicy first to preserve the pod for forensics, capture evidence, then delete and patch.
+- The first response action on this alert isn't killing the pod — it's rotating the credentials that may have been read. Killing the pod doesn't help if the attacker already has the keys.
+- Runbooks are tabletop-tested. A writeup of the dry run captures timing for each phase and surfaces gaps before a real incident.
+- Postmortems are mandatory, even for non-incidents. Each incident produces updates to the runbook so the next response is faster.
 
 ## Repo complete
 
-You've now got phases 02 through 10 plus a 09 ATT&CK matrix. That's the full lab. Day 5 is polish:
-- Push everything to GitHub
-- Pin a screenshot dashboard from Kibana to the README
-- Print the ATT&CK matrix and the runbook for the panel
-- Walk through your repo end-to-end as if presenting to the panel
-
-Good luck.
+This is the full lab — phases 02 through 10 plus the 09 ATT&CK matrix. Polish work that compounds the value:
+- Push to GitHub for portability and review
+- Pin a Kibana dashboard screenshot to the README
+- Keep the ATT&CK matrix and runbook handy as primary artifacts when describing the work
+- Walk through the repo end-to-end periodically to keep the narrative sharp

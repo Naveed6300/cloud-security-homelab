@@ -31,7 +31,7 @@ The two tools overlap but aren't redundant. kube-bench is more granular at the h
 
 ### Posture vs. compliance vs. detection
 
-These get conflated in interviews. Keep them separate:
+These often get conflated. Keep them separate:
 
 - **Posture** — am I configured the way best practice says I should be? (kube-bench, Kubescape, CSPM tools)
 - **Compliance** — am I configured the way a specific framework requires? (CIS, NIST, PCI, SOC 2 — partly the same checks, but mapped to control IDs and producing audit evidence)
@@ -128,7 +128,7 @@ When two tools agree, the finding is real. When only one flags something, dig in
 
 ## Step 3 — Remediate one finding end-to-end
 
-Don't try to fix everything. Pick one finding, fix it, re-scan, and document the before/after. This is the artifact that matters for the interview.
+Don't try to fix everything. Pick one finding, fix it, re-scan, and document the before/after. This is the artifact that demonstrates remediation skill — going past surface-level findings.
 
 A good first one: **automountServiceAccountToken on default ServiceAccounts**. Risk: any pod that doesn't specify a service account gets a token mounted that can be abused if the pod is compromised.
 
@@ -184,12 +184,12 @@ This tracker is the deliverable. Save as `scans/remediation-tracker.md` and refe
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I ran the CIS Kubernetes Benchmark via kube-bench and the NSA framework via Kubescape. They overlap on most things but not all — I cross-referenced both."
-- "I don't aim for 100% PASS on CIS in any environment because some checks are inappropriate for the architecture. I categorize failures as real-risk, accepted-risk, or not-applicable, then prioritize the real-risk findings."
-- "I closed [specific finding] end-to-end and have before/after evidence. The pattern would be the same for the rest of the open findings — what I don't have time for in a lab is the change-management process around each fix in a real environment."
-- "Posture is about being configured correctly. Detection (Falco, my phase 05 work) is about catching the cases where being configured correctly wasn't enough. Both layers matter."
+- Ran the CIS Kubernetes Benchmark via kube-bench and the NSA framework via Kubescape. They overlap on most things but not all — both are useful, neither is sufficient alone.
+- 100% PASS on CIS is rarely the right goal — some checks are inappropriate for the architecture. Failures categorize into real-risk, accepted-risk, or not-applicable; prioritization works on real-risk first.
+- One finding remediated end-to-end, with before/after evidence. The pattern repeats for the rest of the open findings — the missing piece in a lab vs production is change-management process around each fix.
+- Posture is about being configured correctly. Detection (Phase 05's Falco work) is about catching the cases where configuration alone wasn't enough. Both layers matter.
 
 ## Next
 

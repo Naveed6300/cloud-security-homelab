@@ -29,7 +29,7 @@ This is the highest-leverage component in the lab. If you only learn one thing f
 
 MinIO alone is just an empty store. Nextcloud is the user-facing application — login screen, file browser, share links, sync clients — that gives you something realistic to attack and defend in later phases. Phase 04 (admission control), phase 05 (runtime detection), phase 06 (network policy) all use Nextcloud and MinIO as the targets they're protecting.
 
-Nextcloud has two storage modes: it can store files on a local filesystem (the default, easy but not how real cloud apps work) or in an "external" S3-compatible backend with all primary file data in object storage and metadata in a relational DB. We use the second mode because that's how production apps are built and that's what your interview will probe.
+Nextcloud has two storage modes: it can store files on a local filesystem (the default, easy but not how real cloud apps work) or in an "external" S3-compatible backend with all primary file data in object storage and metadata in a relational DB. We use the second mode because that's how production cloud apps are built — separating metadata (relational DB) from primary object data (S3-compatible store) is the canonical architecture.
 
 ### Why Postgres?
 
@@ -384,12 +384,12 @@ $ kubectl -n storage exec deployment/nextcloud -- \
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I deployed an S3-compatible object store and a stateful application that uses it as primary backend. I configured a per-application service account scoped to a single bucket — the same least-privilege pattern you'd use for an IAM user accessing S3 in AWS."
-- "I separated metadata (Postgres) from object data (MinIO). When the panel asks about cloud storage architecture, I can describe the trade-offs I made: stable network identity for the database via StatefulSet, ReadWriteOnce volumes via local-path provisioner, and the implications of that for HA."
-- "I activated Pod Security Standards at the baseline level on the storage namespace. I know what `restricted` would have blocked and why I'd want to move there in production."
-- "I understand the difference between the MinIO root credential and an IAM-style scoped access key, and I configured the application to use the scoped key, not the root."
+- Deployed an S3-compatible object store with a stateful application using it as primary backend. Configured a per-application service account scoped to a single bucket — the same least-privilege pattern as an IAM user accessing S3 in AWS.
+- Separated metadata (Postgres) from object data (MinIO). The architectural trade-offs: stable network identity for the database via StatefulSet, ReadWriteOnce volumes via local-path provisioner, and the resulting implications for HA.
+- Activated Pod Security Standards at the baseline level on the storage namespace. `restricted` would block additional patterns (forced non-root, dropped capabilities, seccomp required); moving there is a production hardening step.
+- Distinguished the MinIO root credential from IAM-style scoped access keys, and configured the application to use the scoped key.
 
 ## Next
 

@@ -11,7 +11,7 @@
 - A Prowler HTML report showing those misconfigurations as findings
 - A triage note explaining what each finding means and how to fix it
 - A remediation of one finding, with a re-scan showing it cleaned up
-- Talking points for the panel on multi-cloud CSPM
+- A clear articulation of multi-cloud CSPM patterns
 
 ---
 
@@ -29,7 +29,7 @@ If you only memorize five things from phase 08, memorize these:
 | CIEM | Cloud Infrastructure Entitlement Management | Identity-and-permissions-focused — finds over-privileged or unused identities. Examples: Wiz CIEM, Sonrai, AWS Access Analyzer. |
 | KSPM | Kubernetes Security Posture Management | CSPM for Kubernetes specifically. Examples: kube-bench (your phase 07 work), Kubescape, Wiz/Orca/Prisma KSPM modules. |
 
-When the panel asks if you've used Wiz / Prisma / Orca, frame answer in terms of these *categories*. "I've worked with CSPM tools — used Defender for Cloud in Azure, and Prowler for AWS in this lab." That's stronger than "I haven't used Wiz directly."
+These categories matter more than specific vendor names. "I've worked with CSPM tools — Defender for Cloud in Azure, Prowler for AWS" generalizes across the vendor space. Vendor-specific knowledge becomes secondary once the category mental model is in place.
 
 ### What Prowler does and how it differs from native tools
 
@@ -186,7 +186,7 @@ For each of your three intentional findings, write a one-paragraph triage in `sc
 - **Ticket title:** [High] SSH open to world: sg-xxxxxxxx
 ```
 
-These three writeups are the artifact for the "walk me through how you triage CSPM findings" interview question.
+These three writeups are the artifact for the "walk me through how you triage CSPM findings" scenario.
 
 ---
 
@@ -223,7 +223,7 @@ The S3 finding should now show as PASS for that bucket. The IAM and SG findings 
 
 ## Step 6 — Compare with AWS Security Hub (optional, 30 min)
 
-If you want extra credit, enable Security Hub in your region with the AWS Foundational Security Best Practices and CIS standards. Wait 20 minutes for findings to populate, then look at the same three resources in the Security Hub console. You'll see overlap with Prowler — that overlap (and where they diverge) is great interview material.
+Optional: enable Security Hub in your region with the AWS Foundational Security Best Practices and CIS standards. Wait 20 minutes for findings to populate, then look at the same three resources in the Security Hub console. You'll see overlap with Prowler — and where they diverge is the interesting part of the comparison.
 
 ---
 
@@ -278,12 +278,12 @@ $ prowler gcp --credentials-file ~/sec-lab-key.json \
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I ran Prowler against an AWS sandbox, found three intentional misconfigurations — public S3 bucket, IAM user without MFA, security group open on 22 — and remediated one with before/after scan evidence."
-- "Prowler is open-source CSPM. It overlaps with AWS Security Hub but runs from outside the cloud, which is useful for cross-cloud workflows. Security Hub aggregates findings *from* AWS services like GuardDuty and Macie."
-- "I know the vocabulary: CSPM finds misconfigurations, CWPP protects workloads at runtime, CIEM focuses on identity entitlements, KSPM is CSPM for Kubernetes, CNAPP is the converged platform that bundles them. Wiz, Orca, Prisma — all CNAPPs."
-- "Triage isn't just severity sorting. I look at exposure (is the resource internet-facing?), reachability (does the misconfig actually expose data?), and ownership (whose team owns it?). 'Public S3' is more urgent than 'CloudTrail not enabled in unused region.'"
+- Ran Prowler against an AWS sandbox: three intentional misconfigurations (public S3 bucket, IAM user without MFA, SSH-open security group), one remediated with before/after scan evidence.
+- Prowler is open-source CSPM running from outside the cloud, which is useful for cross-cloud workflows. AWS Security Hub aggregates findings *from* AWS services like GuardDuty and Macie — different tool, complementary not redundant.
+- Vocabulary: CSPM finds misconfigurations, CWPP protects workloads at runtime, CIEM focuses on identity entitlements, KSPM is CSPM for Kubernetes, CNAPP is the converged platform that bundles them. Wiz, Orca, Prisma — all CNAPPs.
+- Triage isn't just severity sorting. Exposure (internet-facing?), reachability (does the misconfig actually expose data?), and ownership (whose team owns it?) matter as much as severity. "Public S3" is more urgent than "CloudTrail not enabled in unused region."
 
 ## Next
 

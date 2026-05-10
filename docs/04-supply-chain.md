@@ -10,7 +10,7 @@
 - OPA Gatekeeper installed and enforcing three policies
 - A test harness that demonstrates the policies blocking bad workloads
 
-**Note: cosign is deferred.** The original phase 04 in the lab plan included sigstore/cosign for image signing and verifying signed images at admission. We're cutting it for time — image signing is a strong signal but takes 2+ hours to wire up, and Trivy + Gatekeeper give you 80% of the supply-chain story for the interview. Mention cosign and SLSA in the panel as "next steps in the roadmap."
+**Note: cosign is deferred.** The original phase 04 plan included sigstore/cosign for image signing and verifying signed images at admission. It's deferred for scope reasons — image signing is a strong signal but takes meaningful time to wire up, and Trivy + Gatekeeper covers most of the supply-chain story. Cosign and SLSA are documented as next steps in the roadmap.
 
 ---
 
@@ -43,7 +43,7 @@ Every CVE has a CVSS score (0.0–10.0). Tools love it because it produces a cle
 - A CVE marked "Disputed" by the maintainer may be misleading.
 - A CVE in a binary you don't actually call (the package is installed but the vulnerable function is never invoked) doesn't matter much.
 
-For the lab and the interview: filter by severity to triage, but always look at *exposure* and *reachability* before declaring a finding actionable. This nuance is exactly what panels probe with "you have 2,000 findings on Monday morning, what do you do first?"
+In practice: filter by severity to triage, but always look at *exposure* and *reachability* before declaring a finding actionable. This is the answer to the recurring "you have 2,000 findings on Monday morning, what do you do first?" question — it's about applying judgment, not raw counts.
 
 ### Admission controllers
 
@@ -62,9 +62,9 @@ Three options for admission control on Kubernetes:
 |---|---|---|
 | Pod Security Admission (built-in) | No install, three preset levels (privileged/baseline/restricted), works at namespace scope | Coarse — only enforces Pod Security Standards, can't write custom rules |
 | OPA Gatekeeper | Rego language is powerful and standard, large policy library, used widely in industry | Rego has a learning curve |
-| Kyverno | YAML policies, easier to read, more "Kubernetes-native" syntax | Less standard in interviews; smaller ecosystem |
+| Kyverno | YAML policies, easier to read, more "Kubernetes-native" syntax | Smaller ecosystem; less common in large enterprises |
 
-For a Cloud Security Engineer interview, Gatekeeper is the safer choice because it's what most large enterprises run and it teaches you Rego, which transfers to OPA used in CI/CD policy gates.
+For this lab, Gatekeeper is the better choice — it's what most large enterprises run, and Rego transfers directly to OPA used in CI/CD policy gates.
 
 You're already using Pod Security Admission (the `baseline` label on the `storage` namespace from phase 02). Gatekeeper layers *additional* custom rules on top.
 
@@ -138,7 +138,7 @@ Pick three findings from `scans/k8s-trivy.txt` and write a one-line triage in `s
 | CVE-202X-ZZZZ | HIGH | minio:RELEASE.* | Partial — Console exposed | Rebuild on next MinIO release |
 ```
 
-This is the artifact you point at in the panel when they ask "how do you triage CVE findings?" You're not just reading a tool — you're applying judgment.
+This is the deliverable that demonstrates triage skill — applying judgment over a CVE finding, not just reading a tool.
 
 ---
 
@@ -229,7 +229,7 @@ $ kubectl run priv-test --image=busybox --restart=Never \
 # [pod-deny-privileged] Privileged container 'test' not allowed
 ```
 
-Save the rejection error to `scans/gatekeeper-privileged-rejection.txt`. That's your evidence artifact for the interview.
+Save the rejection error to `scans/gatekeeper-privileged-rejection.txt` as evidence the policy is enforcing.
 
 ---
 
@@ -292,7 +292,7 @@ $ kubectl run shady --image=ghcr.io/random/random:latest --restart=Never -n defa
 # rejected
 ```
 
-This is the policy you talk about most in interviews because it directly maps to "how do you prevent a developer from accidentally deploying an untrusted image?"
+This is one of the most impactful policies in practice — it directly addresses "how do you prevent a developer from accidentally deploying an untrusted image?"
 
 ---
 
@@ -337,13 +337,13 @@ Save the audit. If you see violations, decide: is the policy wrong, or is the wo
 
 ---
 
-## What you can now talk about in an interview
+## Key takeaways
 
-- "I scan every image entering the cluster with Trivy and triage findings by severity, exposure, and reachability — not just severity."
-- "I enforce supply-chain policies at admission time with OPA Gatekeeper. I've written constraints that block privileged containers, require resource limits, and restrict the registries images can pull from."
-- "Pod Security Standards handle the obvious cases at the namespace level. Gatekeeper layers custom Rego policies on top for organization-specific rules."
-- "I know the difference between admission control and runtime detection — admission catches misconfigurations before they run, runtime catches malicious behavior at execution. Phase 05 of my lab adds Falco for the runtime layer."
-- "If asked: I'm familiar with cosign and image signing as the next layer above scanning, and I'd add it in production to verify provenance, not just contents."
+- Trivy scans every image entering the cluster; findings are triaged by severity, exposure, and reachability — not severity alone.
+- OPA Gatekeeper enforces supply-chain policies at admission time. Custom Rego constraints block privileged containers, require resource limits, and restrict the registries images can pull from.
+- Pod Security Standards handle the obvious cases at the namespace level. Gatekeeper layers custom Rego policies on top for organization-specific rules.
+- Admission control vs. runtime detection: admission catches misconfigurations *before* they run, runtime catches malicious behavior at execution. Phase 05 adds Falco for the runtime layer.
+- Cosign and image signing are the next layer above scanning — verifying provenance, not just contents. Documented in the roadmap.
 
 ## Next
 
