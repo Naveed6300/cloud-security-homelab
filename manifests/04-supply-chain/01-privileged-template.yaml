@@ -3,7 +3,7 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: k8spsppprivilegedcontainer
+  name: k8spspprivilegedcontainer
   annotations:
     description: "Disallows containers with privileged: true in their securityContext."
 spec:
@@ -15,7 +15,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8spsppprivilegedcontainer
+        package k8spspprivilegedcontainer
 
         # Each "violation" rule emits an admission denial when its body matches.
         violation[{"msg": msg}] {
