@@ -1,0 +1,72 @@
+# Falco Helm values — committable defaults.
+
+driver:
+  kind: ebpf   # Use eBPF probe; never kernel module unless you have a specific reason.
+
+# Falco itself
+falco:
+  json_output: true
+  json_include_output_property: true
+  log_level: info
+  priority: debug   # forward all priorities; filter at Falcosidekick if needed
+
+  # Default rule sources. The custom-rules.yaml ConfigMap (applied separately) appends to these.
+  rules_files:
+    - /etc/falco/falco_rules.yaml
+    - /etc/falco/falco_rules.local.yaml
+    - /etc/falco/k8s_audit_rules.yaml
+    - /etc/falco/rules.d
+
+# Resources — Falco is light but eBPF probe loading needs some headroom on first start
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 1Gi
+    cpu: 1
+
+# Falcosidekick — alert forwarder
+falcosidekick:
+  enabled: true
+  fullfqdn: false
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+    limits:
+      memory: 256Mi
+      cpu: 500m
+
+  # Local UI for browsing alerts during development
+  webui:
+    enabled: true
+    replicaCount: 1
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 256Mi
+        cpu: 500m
+
+  config:
+    # Backend selection — flip these on as you wire each
+    elasticsearch:
+      hostport: ""    # set in falcosidekick-secrets.yaml override
+      index: "falco-events"
+      minimumpriority: "notice"
+      apikey: ""      # set in falcosidekick-secrets.yaml override
+      mutualtls: false
+
+    # Optional: also send to a webhook (Slack, generic webhook, etc.)
+    webhook:
+      address: ""
+      minimumpriority: "warning"
+
+# Custom rules ConfigMap — applied separately in custom-rules.yaml
+customRules:
+  custom-rules.yaml: |
+    # Custom rules are mounted via a separate ConfigMap; this section is the
+    # in-chart fallback. We use the external ConfigMap for clarity.

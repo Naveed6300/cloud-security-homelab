@@ -1,0 +1,73 @@
+# Custom Falco rules tailored to this lab environment.
+# Loaded by Falco from /etc/falco/rules.d via the falco-values.yaml chart config.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-custom-rules
+  namespace: security
+data:
+  custom-rules.yaml: |-
+    # ---- Macros and lists used by the rules below ----
+
+    - macro: postgres_data_dir
+      condition: fd.name startswith /var/lib/postgresql/data
+
+    - list: postgres_processes
+      items: [postgres, pg_ctl, initdb, pg_basebackup]
+
+    - list: cloud_credential_paths
+      items:
+        - /.aws/credentials
+        - /.aws/config
+        - /.azure/credentials
+        - /.config/gcloud/credentials.db
+        - /.mc/config.json
+
+    # ---- Custom rules ----
+
+    - rule: Unauthorized write to Postgres data dir
+      desc: >
+        Detect writes to the Postgres data directory by anything other than
+        the legitimate Postgres processes. Targets attackers who have shelled
+        into the postgres container and try to tamper with data files directly.
+      condition: >
+        open_write and
+        postgres_data_dir and
+        not proc.name in (postgres_processes)
+      output: >
+        Unexpected write to Postgres data dir
+        (user=%user.name proc=%proc.name file=%fd.name container=%container.name image=%container.image.repository)
+      priority: WARNING
+      tags: [database, integrity, mitre_impact]
+
+    - rule: Cloud credential file read
+      desc: >
+        Reading common cloud credential file paths in any container. Maps to
+        MITRE ATT&CK T1552.001 (Credentials in Files). Common post-exploitation
+        behavior — attackers look for AWS/Azure/GCP keys to pivot.
+      condition: >
+        open_read and
+        (fd.name endswith /.aws/credentials or
+         fd.name endswith /.aws/config or
+         fd.name endswith /.azure/credentials or
+         fd.name endswith /.mc/config.json or
+         fd.name endswith /.config/gcloud/credentials.db)
+      output: >
+        Cloud credential file read
+        (user=%user.name proc=%proc.name file=%fd.name container=%container.name image=%container.image.repository)
+      priority: WARNING
+      tags: [credentials, mitre_credential_access, T1552_001]
+
+    - rule: Unexpected egress from MinIO container
+      desc: >
+        MinIO should only accept inbound traffic from Nextcloud and answer outbound
+        DNS. Any other outbound connection from the MinIO container is suspicious.
+      condition: >
+        outbound and
+        container.image.repository contains "minio" and
+        not fd.sport in (53, 123)
+      output: >
+        Unexpected outbound connection from MinIO container
+        (proc=%proc.name dest=%fd.rip:%fd.rport container=%container.name)
+      priority: NOTICE
+      tags: [network, exfiltration, mitre_exfiltration]

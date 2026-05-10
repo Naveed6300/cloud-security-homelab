@@ -1,0 +1,88 @@
+# Nextcloud Helm values — committable defaults. Secrets go in nextcloud-secrets.yaml (gitignored).
+# Chart docs: https://github.com/nextcloud/helm/tree/main/charts/nextcloud
+
+image:
+  repository: nextcloud
+  tag: 30-apache
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "512m"
+  hosts:
+    - host: nextcloud.lab.home.arpa
+      paths:
+        - path: /
+          pathType: Prefix
+
+# All Nextcloud config under ONE top-level key — no duplicates
+nextcloud:
+  host: nextcloud.lab.home.arpa
+  username: admin
+  # password set in nextcloud-secrets.yaml override
+
+  configs:
+    custom.config.php: |-
+      <?php
+      $CONFIG = [
+        'trusted_domains' => [
+          'nextcloud.lab.home.arpa',
+          'localhost',
+        ],
+        'overwriteprotocol' => 'http',
+        'log_type' => 'file',
+        'logfile' => '/var/www/html/data/nextcloud.log',
+        'loglevel' => 1,
+      ];
+
+  # The S3 / MinIO primary object backend — this is the critical wiring.
+  # Files uploaded by users will land in MinIO, not on the local PVC.
+  objectStore:
+    s3:
+      enabled: true
+      host: minio.storage.svc.cluster.local   # cluster-internal Service, NOT Ingress
+      port: 9000
+      bucket: nextcloud-data
+      autoCreate: false                       # we created the bucket manually with a scoped policy
+      useSsl: false                           # internal cluster traffic; flip when cert-manager is in
+      usePathStyle: true                      # required for MinIO (AWS S3 wants virtual-host)
+      region: "us-east-1"                     # MinIO ignores this but the SDK requires it
+      # key and secret set in nextcloud-secrets.yaml override
+
+# Use the Postgres we deployed in step 2 — disable the chart's bundled DB
+internalDatabase:
+  enabled: false
+
+externalDatabase:
+  enabled: true
+  type: postgresql
+  host: postgres.storage.svc.cluster.local
+  user: nextcloud
+  database: nextcloud
+  # password set in nextcloud-secrets.yaml override
+
+# Persistence is for Nextcloud's own configs and PHP session data.
+# Actual user files live in MinIO via the objectStore block above.
+persistence:
+  enabled: true
+  storageClass: local-path
+  size: 5Gi
+  accessMode: ReadWriteOnce
+
+cronjob:
+  enabled: true
+
+podSecurityContext:
+  fsGroup: 33
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 2Gi
+    cpu: 2

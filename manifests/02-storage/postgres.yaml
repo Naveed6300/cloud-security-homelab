@@ -1,0 +1,89 @@
+# Postgres for Nextcloud metadata. StatefulSet (not Deployment) because:
+#   - We want stable pod identity (postgres-0) for predictable DNS
+#   - We want stable PVC binding (each replica gets a dedicated volume)
+#   - Stateful workloads should not be rescheduled with disk reattach surprises
+#
+# This single-replica setup is fine for a lab. In production you'd front it with
+# a Patroni/repmgr HA topology, or use a managed service.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: storage
+spec:
+  clusterIP: None  # headless service — required for StatefulSets to get stable per-pod DNS
+  ports:
+    - port: 5432
+      name: postgres
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: storage
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        # postgres image runs as uid 70 inside the container; this is set so the volume is owned correctly
+        fsGroup: 70
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: nextcloud
+            - name: POSTGRES_USER
+              value: nextcloud
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          # Health checks — pg_isready is the canonical readiness signal for Postgres
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "nextcloud", "-d", "nextcloud"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "nextcloud"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 1Gi
+              cpu: 1
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi

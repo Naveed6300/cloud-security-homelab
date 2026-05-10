@@ -1,0 +1,37 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sallowedrepos
+  annotations:
+    description: "Restricts container images to a list of allowed registry prefixes."
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAllowedRepos
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            registries:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sallowedrepos
+
+        violation[{"msg": msg}] {
+          c := input_containers[_]
+          allowed := {prefix | prefix := input.parameters.registries[_]}
+          not has_allowed_prefix(c.image, allowed)
+          msg := sprintf("Container '%v' image '%v' is not from an allowed registry", [c.name, c.image])
+        }
+
+        has_allowed_prefix(image, allowed) {
+          startswith(image, allowed[_])
+        }
+
+        input_containers[c] { c := input.review.object.spec.containers[_] }
+        input_containers[c] { c := input.review.object.spec.initContainers[_] }

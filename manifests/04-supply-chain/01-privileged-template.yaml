@@ -1,0 +1,29 @@
+# ConstraintTemplate — defines the rule shape using Rego.
+# This template is reusable; the Constraint below instantiates it.
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsppprivilegedcontainer
+  annotations:
+    description: "Disallows containers with privileged: true in their securityContext."
+spec:
+  crd:
+    spec:
+      names:
+        # The kind name created when this template is instantiated as a Constraint
+        kind: K8sPSPPrivilegedContainer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsppprivilegedcontainer
+
+        # Each "violation" rule emits an admission denial when its body matches.
+        violation[{"msg": msg}] {
+          c := input_containers[_]
+          c.securityContext.privileged == true
+          msg := sprintf("Privileged container '%v' is not allowed", [c.name])
+        }
+
+        # Helper to combine spec.containers and spec.initContainers
+        input_containers[c] { c := input.review.object.spec.containers[_] }
+        input_containers[c] { c := input.review.object.spec.initContainers[_] }

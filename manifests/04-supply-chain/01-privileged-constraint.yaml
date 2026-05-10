@@ -1,0 +1,16 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: pod-deny-privileged
+spec:
+  enforcementAction: deny   # alternatives: dryrun, warn — useful while testing
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    # Apply cluster-wide except for system namespaces and Gatekeeper's own
+    excludedNamespaces:
+      - kube-system
+      - kube-public
+      - kube-node-lease
+      - gatekeeper-system

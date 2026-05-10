@@ -1,0 +1,66 @@
+# MinIO Helm values — committable defaults. Real credentials go in minio-secrets.yaml (gitignored).
+#
+# Chart docs: https://github.com/minio/minio/blob/master/helm/minio/README.md
+
+mode: standalone   # single instance. Use "distributed" with 4+ replicas for erasure coding in real deployments.
+
+replicas: 1
+
+# Persistent storage for the MinIO data directory.
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClass: local-path
+  accessMode: ReadWriteOnce
+
+# Resources — MinIO is memory-hungry; below 256Mi it will OOM under load.
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 2Gi
+    cpu: 2
+
+# Don't expose the API port (9000) via Ingress in production — it should only be
+# reachable from inside the cluster. The Ingress here is for the Console (9001) only.
+service:
+  type: ClusterIP
+  port: 9000
+
+consoleService:
+  type: ClusterIP
+  port: 9001
+
+ingress:
+  enabled: true
+  ingressClassName: traefik   # k3s ships with traefik as the default Ingress controller
+  hosts:
+    - minio.lab.home.arpa      # change to match your /etc/hosts mapping
+  path: /
+  pathType: Prefix
+
+consoleIngress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - console.minio.lab.home.arpa
+  path: /
+  pathType: Prefix
+
+# Don't create buckets via Helm — we'll create them in the Console manually so you
+# learn the IAM/policy model. In real deployments you'd Terraform this.
+buckets: []
+users: []
+policies: []
+
+# rootUser and rootPassword are intentionally unset here — they MUST come from the
+# minio-secrets.yaml override that you generate locally and never commit.
+
+# Pod-level security context. baseline-compatible.
+securityContext:
+  enabled: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true

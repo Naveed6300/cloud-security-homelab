@@ -1,0 +1,52 @@
+# --- Secrets and credentials (NEVER commit these) ---
+*.pem
+*.key
+*.crt
+*.kubeconfig
+kubeconfig*
+.env
+.env.*
+!.env.example
+secrets/
+**/secrets.yaml
+**/*-secrets.yaml
+
+# --- Cloud / IaC state ---
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+!*.tfvars.example
+
+# --- Scanner output ---
+scans/
+**/prowler-output/
+**/scoutsuite-report/
+**/trivy-report*
+**/kubescape-output*
+*.sarif
+
+# --- Cosign and signing artifacts ---
+cosign.key
+cosign.pub
+*.sig
+
+# --- Local OS / editor noise ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Helm / kubectl temp files ---
+**/charts/
+**/Chart.lock
+*.tgz
+
+# --- Lab-specific ---
+notes.md
+notes/
+TODO.md
