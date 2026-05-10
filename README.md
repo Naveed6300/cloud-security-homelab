@@ -10,9 +10,9 @@ This repo is structured as a self-paced lab. Each phase is independently runnabl
 |---|---|---|
 | 00 — Proxmox setup | ✅ Complete | Ubuntu cloud-init template + 3 VMs |
 | 01 — k3s cluster | ✅ Complete | Working 3-node k3s cluster with kubectl access |
-| 02 — Storage workload | 🚧 In progress | MinIO + Postgres + Nextcloud, Nextcloud backed by MinIO |
-| 04 — Supply chain | 📋 Planned | Trivy scans + OPA Gatekeeper admission policies |
-| 05 — Runtime security | 📋 Planned | Falco runtime detection shipped to Security Onion |
+| 02 — Storage workload |✅ Complete | MinIO + Postgres + Nextcloud, Nextcloud backed by MinIO |
+| 04 — Supply chain | ✅ Complete | Trivy scans + OPA Gatekeeper admission policies |
+| 05 — Runtime security |🚧 In progress | Falco runtime detection shipped to Security Onion |
 | 06 — Network policy | 📋 Planned (lite) | Default-deny NetworkPolicy with the existing CNI |
 | 07 — Posture / hardening | 📋 Planned | kube-bench + Kubescape baselines |
 | 08 — CSPM scan | 📋 Planned (lite) | Prowler against a small misconfigured AWS environment |
