@@ -62,7 +62,44 @@ We'll use **direct Elasticsearch**. It's the simplest path and gets alerts visib
 
 ---
 
-## Step 1 — Install Falco
+## Step 1 — Prepare Gatekeeper and install Falco
+
+### 1a. Exempt the security namespace from Gatekeeper constraints
+
+Phase 04's admission policies will block Falco from scheduling. Falco needs `privileged: true` to load its eBPF probe and read host syscalls — the `pod-deny-privileged` constraint rejects this. The `pods-require-resource-limits` constraint also blocks Falco's init containers, which don't set limits. Exempt the `security` namespace from both before installing:
+
+```bash
+# Exempt security from the privileged constraint
+$ kubectl patch k8spspprivilegedcontainer pod-deny-privileged --type merge -p '
+spec:
+  match:
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - security
+'
+
+# Remove security from the resource-limits enforcement list
+# (the constraint uses an explicit namespaces include list, not excludedNamespaces)
+$ kubectl patch k8srequiredresourcelimits pods-require-resource-limits --type merge -p '
+spec:
+  match:
+    namespaces:
+      - storage
+      - default
+'
+```
+
+Also add `docker.io/redis/` to your registry allowlist — the Falcosidekick UI requires it for its Redis dependency:
+
+```bash
+$ kubectl edit k8sallowedrepos pod-allowed-registries
+# add: - "docker.io/redis/"  to the registries list under spec.parameters
+```
+
+Update your constraint files in the repo to match these changes.
+
+### 1b. Install Falco
 
 ```bash
 $ helm repo add falcosecurity https://falcosecurity.github.io/charts
@@ -73,11 +110,14 @@ $ kubectl create namespace security
 
 Read `manifests/05-runtime/falco-values.yaml` end to end. Important choices:
 
-- `driver.kind: ebpf` — the modern eBPF driver
+- `driver.kind: modern_ebpf` — use the CO-RE eBPF driver (see note below)
 - `falcosidekick.enabled: true` — install the forwarder alongside Falco
-- `falcosidekick.webui.enabled: true` — installs a small UI at port 2802 for browsing alerts locally (handy for development)
+- `falcosidekick.webui.enabled: true` — installs a small UI at port 2802 for browsing alerts locally
 - `falco.json_output: true` — emit alerts as JSON rather than text (Elasticsearch wants this)
 - `falco.json_include_output_property: true` — include the human-readable message in the JSON
+- `falco.json_include_tags_property: true` — include ATT&CK tags in the JSON (enables technique-based Kibana filtering)
+
+> **Why `modern_ebpf`, not `ebpf`:** The legacy `ebpf` driver tries to download a prebuilt probe for your kernel version, then falls back to compiling it. On Ubuntu 24.04 with kernel 6.8+, no prebuilt probe is available and the compile fallback fails with a GLIBC version mismatch between the driver-loader container and the downloaded kernel headers. `modern_ebpf` uses CO-RE (Compile Once, Run Everywhere) — it ships a single eBPF object that reads BTF from the kernel at runtime, requires no per-kernel probe download or compilation, and starts in seconds. Any kernel 5.8+ with BTF enabled (default on Ubuntu) supports it.
 
 ```bash
 $ helm install falco falcosecurity/falco \
@@ -89,146 +129,206 @@ Wait for Falco to roll out. It runs as a DaemonSet — one pod per node:
 
 ```bash
 $ kubectl -n security get pods
-# 3 falco pods (one per node), 1 falcosidekick, 1 falcosidekick-ui
-```
+# 3 falco pods (one per node), 1 falcosidekick, 1 falcosidekick-ui, 1 redis
 
-Tail Falco logs to confirm rules are loaded:
-
-```bash
-$ kubectl -n security logs daemonset/falco | grep -i "loaded"
-# look for "Loaded N rules from N files"
+$ kubectl -n security logs daemonset/falco --tail=20
+# look for "Starting detection engine" — confirms rules are loaded
 ```
 
 ---
 
-## Step 2 — Watch Falco's UI
+## Step 2 — Access the Falcosidekick UI
 
-Port-forward the Falcosidekick UI to your workstation:
+Two access methods. Pick one.
+
+**Option A — port-forward (on-demand, no persistent config):**
 
 ```bash
 $ kubectl -n security port-forward svc/falco-falcosidekick-ui 2802:2802
+# then: http://localhost:2802
 ```
 
-Open `http://localhost:2802` in a browser. You'll see an empty alert feed. Keep this tab open through the next step.
+**Option B — Ingress (persistent browser access):**
+
+Add to `manifests/05-runtime/falco-values.yaml` under the falcosidekick block and run `helm upgrade`:
+
+```yaml
+falcosidekick:
+  webui:
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hosts:
+        - host: falco.lab.home.arpa
+          paths:
+            - path: /
+              pathType: Prefix
+```
+
+Then add `192.168.2.130  falco.lab.home.arpa` to your Windows hosts file (`C:\Windows\System32\drivers\etc\hosts`). Access via `http://falco.lab.home.arpa`.
+
+**Default credentials:** `admin` / `admin`
+
+Open the UI and keep it visible through the next step — alerts appear in real time as they fire.
 
 ---
 
-## Step 3 — Generate three detections
+## Step 3 — Generate detections
 
 Each of these maps to a default Falco rule. The point is to feel what triggers what, and to save evidence of working detections.
+
+> **Run test pods in the `security` namespace.** The `default` namespace is covered by the `pods-require-resource-limits` Gatekeeper constraint and will reject pods without resource limits. The `security` namespace is exempted.
 
 ### Detection 1 — "Terminal shell in container"
 
 ```bash
-# Create a vanilla pod
-$ kubectl run shellme --image=docker.io/library/alpine --restart=Never -- sleep 3600
+# Create a test pod in the security namespace
+$ kubectl run shellme --image=docker.io/library/alpine \
+    --restart=Never -n security -- sleep 3600
 
 # Wait for it to be Running
-$ kubectl wait --for=condition=Ready pod/shellme
+$ kubectl -n security wait --for=condition=Ready pod/shellme
 
 # Exec into it (this is the trigger)
-$ kubectl exec -it shellme -- sh
-# Inside the pod:
-/ #
+$ kubectl exec -it shellme -n security -- sh
 / # exit
 ```
 
-In the Falcosidekick UI, you should see an alert: **"A shell was spawned in a container with an attached terminal"** at NOTICE severity. The alert payload includes the container ID, image, command (`sh`), user, and the parent process (your kubectl-exec).
+In the Falcosidekick UI you should see **"Terminal shell in container"** at NOTICE severity, tagged `T1059 / mitre_execution`. The alert payload includes container ID, image, command, and the parent process (your kubectl exec).
 
-Save the JSON payload to `scans/falco-shell-alert.json` as detection evidence.
+Save the JSON payload:
+```bash
+$ kubectl -n security logs -l app.kubernetes.io/name=falco --tail=50 \
+    | grep "Terminal shell" | head -1 | jq . > scans/falco-shell-alert.json
+```
 
-### Detection 2 — "Sensitive file read"
-
-Still inside (or back inside) the pod:
+### Detection 2 — "Read sensitive file untrusted"
 
 ```bash
-$ kubectl exec -it shellme -- sh
+$ kubectl exec -it shellme -n security -- sh
 / # cat /etc/shadow
+/ # exit
 ```
 
-The alert: **"Sensitive file read by trusted program after startup"** or **"Read sensitive file untrusted"**. WARNING or NOTICE severity depending on rule. Save it.
+Alert: **"Read sensitive file untrusted"** at WARNING severity, tagged `T1555 / mitre_credential_access`.
 
-### Detection 3 — "Outbound connection to suspicious destination"
+### Detection 3 — "Package manager run in container" + "Drop and execute new binary"
 
 ```bash
-$ kubectl exec -it shellme -- sh
+$ kubectl exec -it shellme -n security -- sh
 / # apk add curl --no-cache
-/ # curl http://example.com  # benign — won't trigger
-/ # nc -zv 1.1.1.1 53        # UDP/TCP probe — may trigger "Outbound connection from container"
+/ # exit
 ```
 
-Some rules require additional context (known bad IP lists, mining pool ports, etc.) — you may not get a "high-severity" hit on a benign destination. That's actually a useful learning: Falco's default ruleset is conservative to avoid noise. **Custom rules** (next step) are how you encode your own threat model.
+This triggers two alerts:
+- **"Package manager run in container"** (your custom rule, WARNING, T1072)
+- **"Drop and execute new binary in container"** (default Falco rule, CRITICAL) — fires because `curl` was downloaded and executed from a path not in the original container image layer
+
+The CRITICAL alert on binary drop is one of Falco's highest-signal default rules — it catches the pattern of an attacker downloading a tool into a running container.
+
+Save the alert JSON:
+```bash
+$ kubectl -n security logs -l app.kubernetes.io/name=falco --tail=100 \
+    | grep -v "Redirect STDOUT" \
+    | grep "Package manager\|Drop and execute" \
+    | head -2 | jq -s . > scans/falco-custom-rule-cred.json
+```
+
+> **Filtering Longhorn noise:** Falco's "Redirect STDOUT/STDIN to Network Connection in Container" rule fires continuously from Longhorn's storage manager doing normal backup operations. This is a false positive — Longhorn legitimately uses `dup3` syscalls that match the rule signature. Filter it with `grep -v "Redirect STDOUT"` when reading logs, and suppress it in Falcosidekick using the UI's filter feature. In production this is resolved by adding a process-name exception to the rule in `custom-rules.yaml`. This is the alert tuning problem that occupies real SOC engineering time.
 
 Clean up:
-
 ```bash
-$ kubectl delete pod shellme
+$ kubectl -n security delete pod shellme
 ```
 
 ---
 
-## Step 4 — Write two custom rules
+## Step 4 — Write custom rules
 
 The default rules are a starting point. Production deployments add custom rules tied to *your* environment's threat model.
 
-### Custom rule 1: alert when anything writes to a Postgres data directory from outside the postgres process
+### Deploying custom rules — the right way
 
-Open `manifests/05-runtime/custom-rules.yaml` and read it. The relevant rule:
+The Falco helm chart's `customRules:` values key is the supported mechanism. The chart creates a ConfigMap from it and mounts it at `/etc/falco/rules.d/`. Do **not** apply a separate ConfigMap with `kubectl apply` — it won't be mounted in the Falco pods unless you also configure `extraVolumes`/`extraVolumeMounts` in the DaemonSet.
 
-```yaml
-- rule: Unauthorized write to Postgres data dir
-  desc: Detect writes to /var/lib/postgresql/data by anything other than postgres
-  condition: >
-    open_write and
-    fd.name startswith /var/lib/postgresql/data and
-    not proc.name in (postgres, pg_ctl, initdb)
-  output: >
-    Unexpected write to Postgres data dir
-    (user=%user.name proc=%proc.name file=%fd.name container=%container.name)
-  priority: WARNING
-  tags: [database, integrity]
-```
-
-This catches: an attacker shells into the Postgres container and tries to tamper with the data files directly.
-
-### Custom rule 2: alert on access keys being read in containers
+Add custom rules inline in `manifests/05-runtime/falco-values.yaml`:
 
 ```yaml
-- rule: AWS or MinIO credential file read
-  desc: Reading common cloud credential file paths in a container
-  condition: >
-    open_read and
-    (fd.name endswith /.aws/credentials or
-     fd.name endswith /.aws/config or
-     fd.name endswith /.mc/config.json)
-  output: >
-    Cloud credential file read
-    (user=%user.name proc=%proc.name file=%fd.name container=%container.name)
-  priority: WARNING
-  tags: [credentials, mitre_credential_access]
+customRules:
+  custom-rules.yaml: |-
+    - rule: Cloud credential file read
+      desc: >
+        Reading common cloud credential file paths in any container. Maps to
+        MITRE ATT&CK T1552.001 (Credentials in Files).
+      condition: >
+        open_read and container and
+        (fd.name endswith /.aws/credentials or
+         fd.name endswith /.aws/config or
+         fd.name endswith /.azure/credentials or
+         fd.name endswith /.mc/config.json or
+         fd.name endswith /.config/gcloud/credentials.db)
+      output: >
+        Cloud credential file read
+        (user=%user.name proc=%proc.name file=%fd.name
+        container=%container.name pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+      tags: [credentials, mitre_credential_access, T1552_001]
+
+    - rule: Package manager run in container
+      desc: Detects package manager execution inside a container (T1072)
+      condition: >
+        spawned_process and container and
+        proc.name in (apk, apt, apt-get, yum, dnf, pip, pip3)
+      output: >
+        Package manager launched in container
+        (user=%user.name proc=%proc.name cmd=%proc.cmdline
+        container=%container.name pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, T1072, mitre_lateral_movement]
+
+    - rule: Unauthorized write to Postgres data dir
+      desc: Detect writes to /var/lib/postgresql/data by anything other than postgres
+      condition: >
+        open_write and container and
+        fd.name startswith /var/lib/postgresql/data and
+        not proc.name in (postgres, pg_ctl, initdb, pg_basebackup)
+      output: >
+        Unexpected write to Postgres data dir
+        (user=%user.name proc=%proc.name file=%fd.name container=%container.name)
+      priority: WARNING
+      tags: [database, integrity, mitre_impact]
 ```
 
-This maps to MITRE ATT&CK **T1552.001 (Credentials in Files)**. It's a classic post-exploitation move.
-
-Apply the custom rules:
+Apply via helm:
 
 ```bash
-$ kubectl apply -f manifests/05-runtime/custom-rules.yaml
-$ kubectl -n security rollout restart daemonset/falco
+$ helm -n security upgrade falco falcosecurity/falco \
+    --values manifests/05-runtime/falco-values.yaml \
+    --reuse-values
+
 $ kubectl -n security rollout status daemonset/falco
+
+# Confirm rules are loaded
+$ POD=$(kubectl -n security get pods -l app.kubernetes.io/name=falco -o name | head -1)
+$ kubectl -n security exec $POD -c falco -- \
+    falco --list-rules 2>/dev/null | grep -E "credential|package|postgres"
 ```
 
-Test rule 2:
+### Test the credential read rule
 
 ```bash
-$ kubectl run cred-test --image=docker.io/library/alpine --restart=Never -- sleep 3600
-$ kubectl exec -it cred-test -- sh
+$ kubectl run cred-test --image=docker.io/library/alpine \
+    --restart=Never -n security -- sleep 3600
+
+$ kubectl exec -it cred-test -n security -- sh
 / # mkdir -p /root/.aws && echo "[default]" > /root/.aws/credentials
 / # cat /root/.aws/credentials
-# alert fires
+/ # exit
+
+$ kubectl -n security delete pod cred-test
 ```
 
-Save the alert JSON to `scans/falco-custom-rule-cred.json`. You now have a custom rule mapped to a specific ATT&CK technique, demonstrating the threat-model-to-detection pipeline.
+Alert: **"Cloud credential file read"** at WARNING, tagged `T1552_001 / mitre_credential_access`. Save the JSON to `scans/falco-custom-rule-cred.json`. You now have a custom rule mapped to a specific ATT&CK technique, demonstrating the threat-model-to-detection pipeline.
 
 ---
 
@@ -317,20 +417,38 @@ In Kibana:
 
 ## Troubleshooting
 
-**Falco pods CrashLoopBackOff with "kernel module load failed".** You're probably hitting the kernel-module driver instead of eBPF. Confirm `driver.kind: ebpf` in your values.
+**Falco DaemonSet stuck at CURRENT=0 (Gatekeeper blocking).**
+The most common failure on first install. Run `kubectl -n security describe daemonset falco | tail -20` — the Events section will show Gatekeeper rejections. Two constraints typically fire: `pod-deny-privileged` (Falco needs privileged for eBPF) and `pods-require-resource-limits` (Falco's init containers don't set limits). Fix: exempt the `security` namespace from both constraints as described in Step 1a. Gatekeeper re-evaluates on next pod creation attempt — the DaemonSet will converge within 30 seconds of applying the patch.
 
-**Falco running but no alerts.** Check the rule set loaded: `kubectl -n security exec ds/falco -- falco --list`. Then trigger something definitively in scope, like `kubectl exec` into a pod (always triggers shell rule). If still silent, look at `journalctl -u falco` on the node — it may be that the eBPF probe isn't loading.
+**Falco driver-loader CrashLoopBackOff: GLIBC mismatch / no prebuilt probe.**
+Check the logs: `kubectl -n security logs <falco-pod> -c falco-driver-loader`. If you see `Non-200 response... 404` followed by `GLIBC_2.38 not found`, you're on the legacy `ebpf` driver. The driver-loader container's base image is too old to compile against the kernel headers for your kernel. Fix: set `driver.kind: modern_ebpf` in `falco-values.yaml` and `helm upgrade`. The modern_ebpf driver uses CO-RE eBPF and doesn't compile anything — it works on any kernel 5.8+ with BTF enabled (default on Ubuntu 22.04+).
 
-**Falcosidekick can't reach Security Onion: TLS errors.** SO uses a self-signed cert. For the lab, set `elasticsearch.minTLSVersion: ""` and accept the risk. In production, mount the SO CA cert into Falcosidekick.
+**Falcosidekick UI stuck at 0/1 (Redis blocked by registry allowlist).**
+The UI depends on `docker.io/redis/redis-stack`. If your `pod-allowed-registries` Gatekeeper constraint doesn't include `docker.io/redis/`, the Redis StatefulSet and the UI Deployment will fail to schedule with a Gatekeeper admission error. Fix: add `"docker.io/redis/"` to the registries list in `manifests/04-supply-chain/03-allowed-registries-constraint.yaml` and `kubectl apply -f` it.
 
-**Falcosidekick reaches SO but no events appear in Kibana.** Check the API key has `superuser` or at least `manage_index` privilege on the target index. Falcosidekick logs show every send attempt with HTTP status — `kubectl -n security logs deployment/falco-falcosidekick`.
+**Longhorn alert noise drowning your detections.**
+The "Redirect STDOUT/STDIN to Network Connection in Container" rule fires every few minutes from Longhorn's backup manager — hundreds of times per hour. It's a true-positive-technically (the `dup3` syscall matches the rule) but a false-positive operationally (Longhorn's behavior is legitimate). Filter it when grepping logs with `grep -v "Redirect STDOUT"`. To suppress at the rule level, add an exception in `customRules`:
+```yaml
+- rule: Redirect STDOUT/STDIN to Network Connection in Container
+  exceptions:
+    - name: longhorn_storage
+      fields: [proc.name]
+      comps: [in]
+      values:
+        - [longhorn, longhorn-instan]
+```
 
-**Too many alerts, can't see the signal.** Falco's defaults are noisy in a lab because everything looks like attacker behavior. Tune by:
-1. Adding `tags: [noisy_in_lab]` to specific rules and excluding them in Falcosidekick filters
-2. Setting some rules to PRIORITY=DEBUG so they don't forward
-3. Using Falco's `lists` and `macros` to whitelist your known-good operations
+**Custom rules not loading (separate ConfigMap approach).**
+If you apply `custom-rules.yaml` as a standalone ConfigMap with `kubectl apply`, Falco won't pick it up — the DaemonSet doesn't know to mount it. The chart-supported method is the `customRules:` values key in `falco-values.yaml` (which the chart mounts automatically at `/etc/falco/rules.d/`). The separate ConfigMap approach requires `extraVolumes` and `extraVolumeMounts` in the chart values, which adds complexity for no benefit.
 
-**A custom rule isn't firing.** `kubectl -n security exec ds/falco -- falco --validate /etc/falco/falco_rules.local.yaml` will show parse errors. Then check the rule's condition matches — Falco has a verbose mode (`-vv`) that logs every condition evaluation.
+**No alerts from `cat /etc/shadow` or package manager.**
+Both rules (`Read sensitive file untrusted` and `Launch Package Management Process in Container`) were moved to `falco-incubating-rules` in Falco 0.37+. They're not loaded by default. The package manager rule is covered by the custom `Package manager run in container` rule in this lab. For the sensitive file rule, either load incubating rules via falcoctl or write your own.
+
+**Falco running but Falcosidekick can't reach Security Onion: TLS errors.**
+SO uses a self-signed cert. For the lab, set `minTLSVersion: ""` in the Elasticsearch config block in `falco-values.yaml`. In production, mount the SO CA cert into Falcosidekick.
+
+**Falcosidekick reaches SO but no events appear in Kibana.**
+Check the API key has `manage_index` privilege on the target index. Falcosidekick logs show every send attempt with HTTP status: `kubectl -n security logs deployment/falco-falcosidekick`.
 
 ---
 
