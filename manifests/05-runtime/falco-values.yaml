@@ -1,7 +1,7 @@
 # Falco Helm values — committable defaults.
 
 driver:
-  kind: ebpf   # Use eBPF probe; never kernel module unless you have a specific reason.
+  kind: modern_ebpf   # Use eBPF probe; never kernel module unless you have a specific reason.
 
 # Falco itself
 falco:
@@ -67,6 +67,29 @@ falcosidekick:
 
 # Custom rules ConfigMap — applied separately in custom-rules.yaml
 customRules:
-  custom-rules.yaml: |
+  custom-rules.yaml: |-
+    - rule: Package manager run in container
+      desc: Detects package manager execution inside a container (T1072)
+      condition: >
+        spawned_process and container and
+        proc.name in (apk, apt, apt-get, yum, dnf, pip, pip3)
+      output: >
+        Package manager launched in container
+        (user=%user.name proc=%proc.name cmd=%proc.cmdline
+        container=%container.name pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, T1072, mitre_lateral_movement]
     # Custom rules are mounted via a separate ConfigMap; this section is the
     # in-chart fallback. We use the external ConfigMap for clarity.
+
+falcosidekick:
+   webui:
+      ingress:
+         enabled: true
+         annotations:
+            kubernetes.io/ingress.class: traefik
+         hosts:
+           - host: falco.lab.home.arpa
+             paths:
+               - path: /
+                 pathType: Prefix

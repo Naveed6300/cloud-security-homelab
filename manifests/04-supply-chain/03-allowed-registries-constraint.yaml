@@ -15,15 +15,14 @@ spec:
       - gatekeeper-system
   parameters:
     registries:
-      # Add your trusted registry prefixes here.
       - "docker.io/library/"
       - "docker.io/nextcloud/"
       - "docker.io/bitnami/"
       - "docker.io/falcosecurity/"
+      - "docker.io/redis/"
       - "quay.io/minio/"
       - "quay.io/kubescape/"
       - "registry.k8s.io/"
       - "rancher/"
       - "openpolicyagent/"
       - "ghcr.io/aquasecurity/"
-      # Add your private registry here in real deployments

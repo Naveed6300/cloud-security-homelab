@@ -11,4 +11,3 @@ spec:
     namespaces:
       - storage
       - default
-      - security    # phase 05 will create this
