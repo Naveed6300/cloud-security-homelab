@@ -45,20 +45,35 @@ A mature program does all three. Phase 05 covered detection. Phase 04 covered pr
 
 - Phases 02, 04, 05 complete.
 - `kubectl` from a cluster-admin context (kube-bench needs to read kubelet configs, kubescape needs to enumerate everything).
-- Kubescape installed on your workstation (or use the in-cluster operator).
+- SSH access to the control plane node (kube-bench runs there directly).
 
 ---
 
 ## Step 1 — kube-bench
 
-The simplest way to run kube-bench is as a Job inside the cluster — it executes on a node and inspects local config files.
+> **Why not the Kubernetes Job approach:** the standard `kubectl apply -f job.yaml` approach fails on this setup for two reasons. First, the Job targets kubeadm binary paths (`/etc/kubernetes/`, `/usr/bin/kube-apiserver`) that don't exist on k3s — the scanner finds nothing to check. Second, Gatekeeper's `pods-require-resource-limits` constraint blocks pod creation in the `default` namespace, so the Job controller silently fails to schedule any pods and hangs indefinitely. Run kube-bench as a binary directly on the control plane node instead.
+
+SSH into the control plane and run kube-bench there:
 
 ```bash
+$ ssh ubuntu@<k3s-cp01-ip>
+
+# Download the kube-bench binary
+$ curl -L https://github.com/aquasecurity/kube-bench/releases/download/v0.9.4/kube-bench_0.9.4_linux_amd64.tar.gz \
+    | tar -xz -C /tmp/
+
+# Run against the k3s CIS benchmark (k3s uses different binary/config paths than kubeadm)
+$ /tmp/kube-bench --benchmark k3s-cis-1.7 2>/dev/null | tee /tmp/kube-bench.txt
+
+# Exit back to your workstation
+$ exit
+
+# Pull results back
 $ mkdir -p scans
-$ kubectl apply -f https://raw.githubusercontent.com/aquasecurity/kube-bench/main/job.yaml
-$ kubectl wait --for=condition=complete --timeout=300s job/kube-bench
-$ kubectl logs job/kube-bench > scans/kube-bench.txt
-$ kubectl delete job kube-bench
+$ scp ubuntu@<k3s-cp01-ip>:/tmp/kube-bench.txt scans/kube-bench.txt
+
+$ tail -30 scans/kube-bench.txt
+# The summary at the bottom shows total PASS/FAIL/WARN counts per section
 ```
 
 Open `scans/kube-bench.txt`. The output is structured as numbered sections (1.1.1, 1.1.2, ...) corresponding to CIS controls. Each line is `[PASS]`, `[FAIL]`, or `[WARN]`.
@@ -82,7 +97,7 @@ $ grep '\[FAIL\]' scans/kube-bench.txt | head -30
    - Anonymous auth enabled on kubelet (CIS 4.2.1) — disable in `--kubelet-config`
    - Audit logging not configured (CIS 1.2.18 / 1.2.19) — add `--audit-log-path` and `--audit-policy-file` to kube-apiserver
    - Default service accounts have tokens auto-mounted (CIS 5.1.5) — set `automountServiceAccountToken: false`
-   - PSP / Pod Security Admission not enforced (CIS 5.2.x) — you've already done this on `storage` namespace; expand to others
+   - PSP / Pod Security Admission not enforced (CIS 5.2.x) — already done on `storage` namespace; expand to others
 
 Save your categorization to `scans/kube-bench-triage.md`.
 
@@ -93,7 +108,7 @@ Save your categorization to `scans/kube-bench-triage.md`.
 Kubescape gives you a different angle, evaluating against frameworks rather than individual checks.
 
 ```bash
-# Install kubescape if you haven't
+# Install kubescape on your workstation (WSL)
 $ curl -s https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | bash
 $ kubescape version
 ```
