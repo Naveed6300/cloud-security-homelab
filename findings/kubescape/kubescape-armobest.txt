@@ -1,0 +1,1317 @@
+
+
+──────────────────────────────────────────────────
+
+
+################################################################################
+ApiVersion: batch/v1
+Kind: Job
+Name: helm-install-traefik-crd
+Namespace: kube-system
+
+Controls: 19 (Failed: 4, action required: 2)
+
+╭──────────┬─────────────────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                                    │ Docs                               │ Assisted remediation                                                    │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers                             │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (helm) │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists                       │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (helm)                           │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked                      │ https://hub.armosec.io/docs/c-0030 │                                                                         │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ High     │ Applications credentials in configuration files │ https://hub.armosec.io/docs/c-0012 │ spec.template.spec.containers[0].env[8].name (helm)                     │
+│          │                                                 │                                    │ spec.template.spec.containers[0].env[8].value (helm)                    │
+╰──────────┴─────────────────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: batch/v1
+Kind: Job
+Name: helm-install-traefik
+Namespace: kube-system
+
+Controls: 19 (Failed: 4, action required: 2)
+
+╭──────────┬─────────────────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                                    │ Docs                               │ Assisted remediation                                                    │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers                             │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (helm) │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists                       │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (helm)                           │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked                      │ https://hub.armosec.io/docs/c-0030 │                                                                         │
+├──────────┼─────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ High     │ Applications credentials in configuration files │ https://hub.armosec.io/docs/c-0012 │ spec.template.spec.containers[0].env[8].name (helm)                     │
+│          │                                                 │                                    │ spec.template.spec.containers[0].env[8].value (helm)                    │
+╰──────────┴─────────────────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: svclb
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: falco-falcosidekick
+Namespace: security
+
+Controls: 20 (Failed: 6, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                             │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (falcosidekick)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (falcosidekick)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (falcosidekick)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (falcosidekick)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (falcosidekick)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (falcosidekick)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (falcosidekick) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (falcosidekick)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                  │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: helm-traefik-crd
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬──────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation         │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼──────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴──────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: local-path-provisioner-service-account
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: DaemonSet
+Name: falco
+Namespace: security
+
+Controls: 20 (Failed: 9, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                        │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (falco)                                  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (falco)                                    │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsNonRoot=true (falcoctl-artifact-follow)               │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsGroup=1000 (falcoctl-artifact-follow)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (falco)                        │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.readOnlyRootFilesystem=true (falcoctl-artifact-follow)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (falco)                     │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (falco)                                   │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.allowPrivilegeEscalation=false (falcoctl-artifact-follow)  │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.privileged=false (falcoctl-artifact-follow)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (falco)                          │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (falco)                          │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (falco)                    │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seccompProfile=YOUR_VALUE (falcoctl-artifact-follow)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seLinuxOptions=YOUR_VALUE (falcoctl-artifact-follow)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.capabilities.drop[0]=YOUR_VALUE (falcoctl-artifact-follow) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.template.spec.containers[0].securityContext.privileged (falco)                                         │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (falco)                                                              │
+│          │                                │                                    │ spec.template.spec.containers[1].image (falcoctl-artifact-follow)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                             │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[1].resources.limits.cpu=YOUR_VALUE (falcoctl-artifact-follow)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[1].resources.limits.memory=YOUR_VALUE (falcoctl-artifact-follow)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: StatefulSet
+Name: postgres
+Namespace: storage
+
+Controls: 20 (Failed: 6, action required: 2)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation                                                                        │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers                  │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (postgres)               │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (postgres)                 │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem       │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (postgres)     │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation           │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (postgres)  │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (postgres)                │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ spec.template.spec.automountServiceAccountToken=false                                       │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                      │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (postgres)       │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (postgres)       │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (postgres) │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists            │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (postgres)                                           │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: DaemonSet
+Name: longhorn-csi-plugin
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 10, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                       │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[2].securityContext.runAsNonRoot=true (longhorn-csi-plugin)                   │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.runAsGroup=1000 (longhorn-csi-plugin)                     │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsNonRoot=true (longhorn-liveness-probe)               │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsGroup=1000 (longhorn-liveness-probe)                 │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (node-driver-registrar)                 │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (node-driver-registrar)                   │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[2].securityContext.readOnlyRootFilesystem=true (longhorn-csi-plugin)         │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.readOnlyRootFilesystem=true (longhorn-liveness-probe)     │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (node-driver-registrar)       │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Insecure capabilities          │ https://hub.armosec.io/docs/c-0046 │ spec.template.spec.containers[2].securityContext.capabilities.add[0] (longhorn-csi-plugin)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[2].securityContext.allowPrivilegeEscalation=false (longhorn-csi-plugin)      │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.privileged=false (longhorn-csi-plugin)                    │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.allowPrivilegeEscalation=false (longhorn-liveness-probe)  │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.privileged=false (longhorn-liveness-probe)                │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (node-driver-registrar)    │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (node-driver-registrar)                  │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (node-driver-registrar)         │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (node-driver-registrar)         │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (node-driver-registrar)   │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seccompProfile=YOUR_VALUE (longhorn-liveness-probe)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seLinuxOptions=YOUR_VALUE (longhorn-liveness-probe)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.capabilities.drop[0]=YOUR_VALUE (longhorn-liveness-probe) │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.seccompProfile=YOUR_VALUE (longhorn-csi-plugin)           │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.seLinuxOptions=YOUR_VALUE (longhorn-csi-plugin)           │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.capabilities.drop[0]=YOUR_VALUE (longhorn-csi-plugin)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.template.spec.containers[0].securityContext.privileged (node-driver-registrar)                        │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.capabilities.add[0] (longhorn-csi-plugin)                 │
+│          │                                │                                    │ spec.template.spec.containers[2].securityContext.privileged (longhorn-csi-plugin)                          │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (node-driver-registrar)                                             │
+│          │                                │                                    │ spec.template.spec.containers[1].image (longhorn-liveness-probe)                                           │
+│          │                                │                                    │ spec.template.spec.containers[2].image (longhorn-csi-plugin)                                               │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                            │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[2].resources.limits.cpu=YOUR_VALUE (longhorn-csi-plugin)                     │
+│          │                                │                                    │ spec.template.spec.containers[1].resources.limits.cpu=YOUR_VALUE (longhorn-liveness-probe)                 │
+│          │                                │                                    │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (node-driver-registrar)                   │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[2].resources.limits.memory=YOUR_VALUE (longhorn-csi-plugin)                  │
+│          │                                │                                    │ spec.template.spec.containers[1].resources.limits.memory=YOUR_VALUE (longhorn-liveness-probe)              │
+│          │                                │                                    │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (node-driver-registrar)                │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: default
+Namespace: storage
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: volumeattributesclass-protection-controller
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: 
+Kind: ServiceAccount
+Name: helm-traefik-crd
+Namespace: kube-system
+
+Controls: 4 (Failed: 4, action required: 0)
+
+╭──────────┬────────────────────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────╮
+│ Severity │ Control name                                       │ Docs                               │ Assisted remediation                    │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Prevent containers from allowing command execution │ https://hub.armosec.io/docs/c-0002 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Administrative Roles                               │ https://hub.armosec.io/docs/c-0035 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ No impersonation                                   │ https://hub.armosec.io/docs/c-0065 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Portforwarding privileges                          │ https://hub.armosec.io/docs/c-0063 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+╰──────────┴────────────────────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: longhorn-ui
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (longhorn-ui)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (longhorn-ui)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (longhorn-ui)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (longhorn-ui)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (longhorn-ui)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (longhorn-ui)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (longhorn-ui)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (longhorn-ui) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (longhorn-ui)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (longhorn-ui)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (longhorn-ui)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: falco-falcosidekick-ui
+Namespace: security
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: minio-sa
+Namespace: storage
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: longhorn-service-account
+Namespace: longhorn-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: default
+Namespace: longhorn-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: local-path-provisioner
+Namespace: kube-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                      │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (local-path-provisioner)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (local-path-provisioner)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (local-path-provisioner)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (local-path-provisioner)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (local-path-provisioner)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (local-path-provisioner)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (local-path-provisioner)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (local-path-provisioner) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (local-path-provisioner)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (local-path-provisioner)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (local-path-provisioner)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Pod
+Name: instance-manager-69591f8135e195a3e814269d7c41035c
+Namespace: longhorn-system
+
+Controls: 19 (Failed: 9, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                  │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.containers[0].securityContext.runAsNonRoot=true (instance-manager)               │
+│          │                                │                                    │ spec.containers[0].securityContext.runAsGroup=1000 (instance-manager)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.containers[0].securityContext.readOnlyRootFilesystem=true (instance-manager)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.containers[0].securityContext.allowPrivilegeEscalation=false (instance-manager)  │
+│          │                                │                                    │ spec.containers[0].securityContext.privileged=false (instance-manager)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (instance-manager)       │
+│          │                                │                                    │ spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (instance-manager)       │
+│          │                                │                                    │ spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (instance-manager) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.containers[0].securityContext.privileged (instance-manager)                      │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.containers[0].image (instance-manager)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                       │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.containers[0].resources.limits.cpu=YOUR_VALUE (instance-manager)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.containers[0].resources.limits.memory=YOUR_VALUE (instance-manager)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: DaemonSet
+Name: engine-image-ei-75a03ec3
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 9, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                        │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (engine-image-ei-75a03ec3)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (engine-image-ei-75a03ec3)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (engine-image-ei-75a03ec3)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (engine-image-ei-75a03ec3)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (engine-image-ei-75a03ec3)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (engine-image-ei-75a03ec3)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (engine-image-ei-75a03ec3)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (engine-image-ei-75a03ec3) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.template.spec.containers[0].securityContext.privileged (engine-image-ei-75a03ec3)                      │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (engine-image-ei-75a03ec3)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                             │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (engine-image-ei-75a03ec3)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (engine-image-ei-75a03ec3)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: StatefulSet
+Name: falco-falcosidekick-ui-redis
+Namespace: security
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (redis)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (redis)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (redis)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (redis)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (redis)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (redis)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (redis)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (redis) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (redis)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                          │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (redis)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (redis)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: csi-snapshotter
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                               │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (csi-snapshotter)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (csi-snapshotter)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (csi-snapshotter)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (csi-snapshotter)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (csi-snapshotter)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (csi-snapshotter)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (csi-snapshotter)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (csi-snapshotter) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (csi-snapshotter)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                    │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (csi-snapshotter)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (csi-snapshotter)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: falco-falcosidekick
+Namespace: security
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: service-cidrs-controller
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Namespace
+Name: longhorn-system
+
+Controls: 2 (Failed: 2, action required: 0)
+
+╭──────────┬─────────────────────────────┬────────────────────────────────────┬──────────────────────╮
+│ Severity │ Control name                │ Docs                               │ Assisted remediation │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Low      │ Network mapping             │ https://hub.armosec.io/docs/c-0049 │                      │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Medium   │ Cluster internal networking │ https://hub.armosec.io/docs/c-0054 │                      │
+╰──────────┴─────────────────────────────┴────────────────────────────────────┴──────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: minio
+Namespace: storage
+
+Controls: 20 (Failed: 4, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (minio)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (minio)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (minio)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (minio)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (minio)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (minio) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (minio)                                           │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: gatekeeper-admin
+Namespace: gatekeeper-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: longhorn-driver-deployer
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                        │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.securityContext.runAsUser=1000                                                           │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (longhorn-driver-deployer)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (longhorn-driver-deployer)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (longhorn-driver-deployer)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (longhorn-driver-deployer)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (longhorn-driver-deployer)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (longhorn-driver-deployer)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (longhorn-driver-deployer) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (longhorn-driver-deployer)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                             │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (longhorn-driver-deployer)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (longhorn-driver-deployer)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: 
+Kind: ServiceAccount
+Name: longhorn-support-bundle
+Namespace: longhorn-system
+
+Controls: 4 (Failed: 4, action required: 0)
+
+╭──────────┬────────────────────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────╮
+│ Severity │ Control name                                       │ Docs                               │ Assisted remediation                    │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Prevent containers from allowing command execution │ https://hub.armosec.io/docs/c-0002 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Administrative Roles                               │ https://hub.armosec.io/docs/c-0035 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ No impersonation                                   │ https://hub.armosec.io/docs/c-0065 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Portforwarding privileges                          │ https://hub.armosec.io/docs/c-0063 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+╰──────────┴────────────────────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: csi-resizer
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (csi-resizer)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (csi-resizer)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (csi-resizer)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (csi-resizer)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (csi-resizer)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (csi-resizer)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (csi-resizer)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (csi-resizer) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (csi-resizer)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (csi-resizer)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (csi-resizer)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: helm-traefik
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬──────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation         │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼──────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴──────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: nextcloud
+Namespace: storage
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation                                                                              │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers                  │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (nextcloud)                    │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (nextcloud)                      │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.runAsNonRoot=true (nextcloud-cron)               │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.runAsGroup=1000 (nextcloud-cron)                 │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem       │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (nextcloud)          │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.readOnlyRootFilesystem=true (nextcloud-cron)     │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation           │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (nextcloud)       │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (nextcloud)                     │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.allowPrivilegeEscalation=false (nextcloud-cron)  │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.privileged=false (nextcloud-cron)                │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ spec.template.spec.automountServiceAccountToken=false                                             │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                      │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (nextcloud)            │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (nextcloud)            │
+│          │                                      │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (nextcloud)      │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.seccompProfile=YOUR_VALUE (nextcloud-cron)       │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.seLinuxOptions=YOUR_VALUE (nextcloud-cron)       │
+│          │                                      │                                    │ spec.template.spec.containers[1].securityContext.capabilities.drop[0]=YOUR_VALUE (nextcloud-cron) │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists            │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (nextcloud)                                                │
+│          │                                      │                                    │ spec.template.spec.containers[1].image (nextcloud-cron)                                           │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set            │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[1].resources.limits.cpu=YOUR_VALUE (nextcloud-cron)                 │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set         │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[1].resources.limits.memory=YOUR_VALUE (nextcloud-cron)              │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: csi-provisioner
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                               │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (csi-provisioner)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (csi-provisioner)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (csi-provisioner)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (csi-provisioner)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (csi-provisioner)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (csi-provisioner)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (csi-provisioner)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (csi-provisioner) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (csi-provisioner)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                    │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (csi-provisioner)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (csi-provisioner)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: gatekeeper-controller-manager
+Namespace: gatekeeper-system
+
+Controls: 20 (Failed: 3, action required: 2)
+
+╭──────────┬────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name               │ Docs                               │ Assisted remediation                                                       │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists  │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (manager)                           │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked │ https://hub.armosec.io/docs/c-0030 │                                                                            │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set  │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (manager) │
+╰──────────┴────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: default
+Namespace: identity
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: validatingadmissionpolicy-status-controller
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: default
+Namespace: gatekeeper-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: falco-falcosidekick-ui
+Namespace: security
+
+Controls: 20 (Failed: 6, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (falcosidekick-ui)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (falcosidekick-ui)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (falcosidekick-ui)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (falcosidekick-ui)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (falcosidekick-ui)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (falcosidekick-ui)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (falcosidekick-ui) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (falcosidekick-ui)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                     │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: legacy-service-account-token-cleaner
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: resource-claim-controller
+Namespace: kube-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: DaemonSet
+Name: longhorn-manager
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 9, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                                            │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (longhorn-manager)                           │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (longhorn-manager)                             │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsNonRoot=true (pre-pull-share-manager-image)               │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.runAsGroup=1000 (pre-pull-share-manager-image)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (longhorn-manager)                 │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.readOnlyRootFilesystem=true (pre-pull-share-manager-image)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (longhorn-manager)              │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (longhorn-manager)                            │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.allowPrivilegeEscalation=false (pre-pull-share-manager-image)  │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.privileged=false (pre-pull-share-manager-image)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (longhorn-manager)                   │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (longhorn-manager)                   │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (longhorn-manager)             │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seccompProfile=YOUR_VALUE (pre-pull-share-manager-image)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.seLinuxOptions=YOUR_VALUE (pre-pull-share-manager-image)       │
+│          │                                │                                    │ spec.template.spec.containers[1].securityContext.capabilities.drop[0]=YOUR_VALUE (pre-pull-share-manager-image) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.template.spec.containers[0].securityContext.privileged (longhorn-manager)                                  │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (longhorn-manager)                                                       │
+│          │                                │                                    │ spec.template.spec.containers[1].image (pre-pull-share-manager-image)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (longhorn-manager)                             │
+│          │                                │                                    │ spec.template.spec.containers[1].resources.limits.cpu=YOUR_VALUE (pre-pull-share-manager-image)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (longhorn-manager)                          │
+│          │                                │                                    │ spec.template.spec.containers[1].resources.limits.memory=YOUR_VALUE (pre-pull-share-manager-image)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: longhorn-support-bundle
+Namespace: longhorn-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: gatekeeper-audit
+Namespace: gatekeeper-system
+
+Controls: 20 (Failed: 3, action required: 2)
+
+╭──────────┬────────────────────────────┬────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name               │ Docs                               │ Assisted remediation                                                       │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists  │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (manager)                           │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked │ https://hub.armosec.io/docs/c-0030 │                                                                            │
+├──────────┼────────────────────────────┼────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set  │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (manager) │
+╰──────────┴────────────────────────────┴────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: default
+Namespace: security
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: 
+Kind: ServiceAccount
+Name: helm-traefik
+Namespace: kube-system
+
+Controls: 4 (Failed: 4, action required: 0)
+
+╭──────────┬────────────────────────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────╮
+│ Severity │ Control name                                       │ Docs                               │ Assisted remediation                    │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Prevent containers from allowing command execution │ https://hub.armosec.io/docs/c-0002 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Administrative Roles                               │ https://hub.armosec.io/docs/c-0035 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ No impersonation                                   │ https://hub.armosec.io/docs/c-0065 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+├──────────┼────────────────────────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ Portforwarding privileges                          │ https://hub.armosec.io/docs/c-0063 │ relatedObjects[1].rules[0].resources[0] │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                                                    │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                                                    │                                    │ relatedObjects[0].subjects[0]           │
+│          │                                                    │                                    │ relatedObjects[0].roleRef.name          │
+╰──────────┴────────────────────────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: 
+Kind: ServiceAccount
+Name: longhorn-service-account
+Namespace: longhorn-system
+
+Controls: 4 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────┬────────────────────────────────────┬─────────────────────────────────────────╮
+│ Severity │ Control name     │ Docs                               │ Assisted remediation                    │
+├──────────┼──────────────────┼────────────────────────────────────┼─────────────────────────────────────────┤
+│ Medium   │ No impersonation │ https://hub.armosec.io/docs/c-0065 │ relatedObjects[1].rules[0].resources[7] │
+│          │                  │                                    │ relatedObjects[1].rules[0].verbs[0]     │
+│          │                  │                                    │ relatedObjects[1].rules[0].apiGroups[0] │
+│          │                  │                                    │ relatedObjects[0].subjects[0]           │
+│          │                  │                                    │ relatedObjects[0].roleRef.name          │
+╰──────────┴──────────────────┴────────────────────────────────────┴─────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: traefik
+Namespace: kube-system
+
+Controls: 20 (Failed: 4, action required: 2)
+
+╭──────────┬──────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                 │ Docs                               │ Assisted remediation                                                          │
+├──────────┼──────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists    │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (traefik)                              │
+├──────────┼──────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked   │ https://hub.armosec.io/docs/c-0030 │                                                                               │
+├──────────┼──────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set    │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (traefik)    │
+├──────────┼──────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (traefik) │
+╰──────────┴──────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Pod
+Name: instance-manager-5768fba6145a92d443de7c9cc0e1c9f5
+Namespace: longhorn-system
+
+Controls: 19 (Failed: 9, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                  │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.containers[0].securityContext.runAsNonRoot=true (instance-manager)               │
+│          │                                │                                    │ spec.containers[0].securityContext.runAsGroup=1000 (instance-manager)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.containers[0].securityContext.readOnlyRootFilesystem=true (instance-manager)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.containers[0].securityContext.allowPrivilegeEscalation=false (instance-manager)  │
+│          │                                │                                    │ spec.containers[0].securityContext.privileged=false (instance-manager)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (instance-manager)       │
+│          │                                │                                    │ spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (instance-manager)       │
+│          │                                │                                    │ spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (instance-manager) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Privileged container           │ https://hub.armosec.io/docs/c-0057 │ spec.containers[0].securityContext.privileged (instance-manager)                      │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.containers[0].image (instance-manager)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                       │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.containers[0].resources.limits.cpu=YOUR_VALUE (instance-manager)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.containers[0].resources.limits.memory=YOUR_VALUE (instance-manager)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Namespace
+Name: security
+
+Controls: 2 (Failed: 2, action required: 0)
+
+╭──────────┬─────────────────────────────┬────────────────────────────────────┬──────────────────────╮
+│ Severity │ Control name                │ Docs                               │ Assisted remediation │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Low      │ Network mapping             │ https://hub.armosec.io/docs/c-0049 │                      │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Medium   │ Cluster internal networking │ https://hub.armosec.io/docs/c-0054 │                      │
+╰──────────┴─────────────────────────────┴────────────────────────────────────┴──────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Namespace
+Name: gatekeeper-system
+
+Controls: 2 (Failed: 2, action required: 0)
+
+╭──────────┬─────────────────────────────┬────────────────────────────────────┬──────────────────────╮
+│ Severity │ Control name                │ Docs                               │ Assisted remediation │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Low      │ Network mapping             │ https://hub.armosec.io/docs/c-0049 │                      │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Medium   │ Cluster internal networking │ https://hub.armosec.io/docs/c-0054 │                      │
+╰──────────┴─────────────────────────────┴────────────────────────────────────┴──────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: longhorn-ui-service-account
+Namespace: longhorn-system
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: Namespace
+Name: identity
+
+Controls: 2 (Failed: 2, action required: 0)
+
+╭──────────┬─────────────────────────────┬────────────────────────────────────┬──────────────────────╮
+│ Severity │ Control name                │ Docs                               │ Assisted remediation │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Low      │ Network mapping             │ https://hub.armosec.io/docs/c-0049 │                      │
+├──────────┼─────────────────────────────┼────────────────────────────────────┼──────────────────────┤
+│ Medium   │ Cluster internal networking │ https://hub.armosec.io/docs/c-0054 │                      │
+╰──────────┴─────────────────────────────┴────────────────────────────────────┴──────────────────────╯
+
+################################################################################
+ApiVersion: v1
+Kind: ServiceAccount
+Name: falco
+Namespace: security
+
+Controls: 1 (Failed: 1, action required: 0)
+
+╭──────────┬──────────────────────────────────────┬────────────────────────────────────┬────────────────────────────────────╮
+│ Severity │ Control name                         │ Docs                               │ Assisted remediation               │
+├──────────┼──────────────────────────────────────┼────────────────────────────────────┼────────────────────────────────────┤
+│ Medium   │ Automatic mapping of service account │ https://hub.armosec.io/docs/c-0034 │ automountServiceAccountToken=false │
+╰──────────┴──────────────────────────────────────┴────────────────────────────────────┴────────────────────────────────────╯
+
+################################################################################
+ApiVersion: apps/v1
+Kind: Deployment
+Name: csi-attacher
+Namespace: longhorn-system
+
+Controls: 20 (Failed: 8, action required: 2)
+
+╭──────────┬────────────────────────────────┬────────────────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ Severity │ Control name                   │ Docs                               │ Assisted remediation                                                                            │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Non-root containers            │ https://hub.armosec.io/docs/c-0013 │ spec.template.spec.containers[0].securityContext.runAsNonRoot=true (csi-attacher)               │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.runAsGroup=1000 (csi-attacher)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Low      │ Immutable container filesystem │ https://hub.armosec.io/docs/c-0017 │ spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem=true (csi-attacher)     │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Allow privilege escalation     │ https://hub.armosec.io/docs/c-0016 │ spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation=false (csi-attacher)  │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.privileged=false (csi-attacher)                │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Linux hardening                │ https://hub.armosec.io/docs/c-0055 │ spec.template.spec.containers[0].securityContext.seccompProfile=YOUR_VALUE (csi-attacher)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.seLinuxOptions=YOUR_VALUE (csi-attacher)       │
+│          │                                │                                    │ spec.template.spec.containers[0].securityContext.capabilities.drop[0]=YOUR_VALUE (csi-attacher) │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Check if signature exists      │ https://hub.armosec.io/docs/c-0237 │ spec.template.spec.containers[0].image (csi-attacher)                                           │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Medium   │ Ingress and Egress blocked     │ https://hub.armosec.io/docs/c-0030 │                                                                                                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure CPU limits are set      │ https://hub.armosec.io/docs/c-0270 │ spec.template.spec.containers[0].resources.limits.cpu=YOUR_VALUE (csi-attacher)                 │
+├──────────┼────────────────────────────────┼────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ High     │ Ensure memory limits are set   │ https://hub.armosec.io/docs/c-0271 │ spec.template.spec.containers[0].resources.limits.memory=YOUR_VALUE (csi-attacher)              │
+╰──────────┴────────────────────────────────┴────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+Framework scanned: ArmoBest
+
+╭─────────────────┬────╮
+│        Controls │ 39 │
+│          Passed │ 14 │
+│          Failed │ 18 │
+│ Action Required │ 7  │
+╰─────────────────┴────╯
+
+Failed resources by severity:
+
+╭──────────┬─────╮
+│ Critical │ 0   │
+│     High │ 67  │
+│   Medium │ 120 │
+│      Low │ 23  │
+╰──────────┴─────╯
+
+╭──────────┬───────────────────────────────────────────────────────┬──────────────────┬───────────────┬─────────────────────╮
+│ Severity │ Control name                                          │ Failed resources │ All Resources │ Compliance score    │
+├──────────┼───────────────────────────────────────────────────────┼──────────────────┼───────────────┼─────────────────────┤
+│ Critical │ API server insecure port is enabled                   │         0        │       0       │         100%        │
+│ Critical │ Disable anonymous access to Kubelet service           │         0        │       0       │ Action Required *** │
+│ Critical │ Enforce Kubelet client TLS authentication             │         0        │       0       │ Action Required *** │
+│   High   │ Applications credentials in configuration files       │         2        │       52      │         96%         │
+│   High   │ Host PID/IPC privileges                               │         0        │       26      │         100%        │
+│   High   │ HostNetwork access                                    │         0        │       26      │         100%        │
+│   High   │ Insecure capabilities                                 │         1        │       26      │         96%         │
+│   High   │ Privileged container                                  │         6        │       26      │         77%         │
+│   High   │ CVE-2021-25742-nginx-ingress-snippet-annotation-vu... │         0        │       0       │         100%        │
+│   High   │ CVE-2022-23648-containerd-fs-escape                   │         0        │       3       │         100%        │
+│   High   │ CVE-2022-47633-kyverno-signature-bypass               │         0        │       0       │         100%        │
+│   High   │ Verify image signature                                │         0        │       26      │  Action Required *  │
+│   High   │ Check if signature exists                             │        24        │       26      │          8%         │
+│   High   │ Ensure CPU limits are set                             │        18        │       26      │         31%         │
+│   High   │ Ensure memory limits are set                          │        16        │       26      │         38%         │
+│  Medium  │ Prevent containers from allowing command execution    │         3        │       83      │         96%         │
+│  Medium  │ Non-root containers                                   │        20        │       26      │         23%         │
+│  Medium  │ Allow privilege escalation                            │        19        │       26      │         27%         │
+│  Medium  │ Ingress and Egress blocked                            │        21        │       33      │         36%         │
+│  Medium  │ Automatic mapping of service account                  │        24        │       85      │         72%         │
+│  Medium  │ Administrative Roles                                  │         3        │       83      │         96%         │
+│  Medium  │ Container hostPort                                    │         0        │       26      │         100%        │
+│  Medium  │ Cluster internal networking                           │         4        │       9       │         56%         │
+│  Medium  │ Linux hardening                                       │        19        │       26      │         27%         │
+│  Medium  │ CVE-2021-25741 - Using symlink for arbitrary host ... │         0        │       0       │         100%        │
+│  Medium  │ Sudo in container entrypoint                          │         0        │       26      │         100%        │
+│  Medium  │ Portforwarding privileges                             │         3        │       83      │         96%         │
+│  Medium  │ No impersonation                                      │         4        │       83      │         95%         │
+│  Medium  │ Secret/etcd encryption enabled                        │         0        │       0       │  Action Required ** │
+│  Medium  │ Audit logs enabled                                    │         0        │       0       │  Action Required ** │
+│  Medium  │ Images from allowed registry                          │         0        │       26      │  Action Required *  │
+│  Medium  │ CVE-2022-0185-linux-kernel-container-escape           │         0        │       3       │         100%        │
+│  Medium  │ CVE-2022-24348-argocddirtraversal                     │         0        │       0       │         100%        │
+│  Medium  │ Nginx Ingress Controller End of Life                  │         0        │       22      │         100%        │
+│    Low   │ Immutable container filesystem                        │        19        │       26      │         27%         │
+│    Low   │ Network mapping                                       │         4        │       9       │         56%         │
+│    Low   │ Pods in default namespace                             │         0        │       26      │         100%        │
+│    Low   │ PSP enabled                                           │         0        │       0       │  Action Required ** │
+│    Low   │ CVE-2022-3172-aggregated-API-server-redirect          │         0        │       2       │         100%        │
+├──────────┼───────────────────────────────────────────────────────┼──────────────────┼───────────────┼─────────────────────┤
+│          │                    Resource Summary                   │        54        │      218      │        62.91%       │
+╰──────────┴───────────────────────────────────────────────────────┴──────────────────┴───────────────┴─────────────────────╯
+
+🚨 * Control configurations are empty (docs: https://kubescape.io/docs/frameworks-and-controls/configuring-controls)
+🚨 ** failed to get cloud provider, cluster: default
+🚨 *** This control is scanned exclusively by the Kubescape operator, not the Kubescape CLI. Install the Kubescape operator:
+     https://kubescape.io/docs/install-operator/.

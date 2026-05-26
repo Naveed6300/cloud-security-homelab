@@ -1,0 +1,76 @@
+
+Summary Report for default
+==========================
+
+Workload Assessment
+┌─────────────────┬───────────────────────────────────────────────────────┬─────────────────┬───────────────────┬─────────┐
+│    Namespace    │                       Resource                        │ Vulnerabilities │ Misconfigurations │ Secrets │
+│                 │                                                       ├───────┬─────────┼─────────┬─────────┼────┬────┤
+│                 │                                                       │   C   │   H     │    C    │    H    │ C  │ H  │
+├─────────────────┼───────────────────────────────────────────────────────┼───────┼─────────┼─────────┼─────────┼────┼────┤
+│ storage         │ Deployment/minio                                      │   5   │   34    │         │ 1       │    │    │
+│ storage         │ StatefulSet/postgres                                  │   1   │   8     │         │ 2       │    │    │
+│ storage         │ Deployment/nextcloud                                  │  126  │  1204   │         │ 4       │    │    │
+│ longhorn-system │ Deployment/csi-provisioner                            │   1   │   4     │         │ 3       │    │    │
+│ longhorn-system │ Pod/instance-manager-1c877faf45d6ad64d2d8b6eacb4ac383 │   2   │   34    │         │ 4       │    │    │
+│ longhorn-system │ DaemonSet/longhorn-csi-plugin                         │   3   │   35    │         │ 9       │    │    │
+│ longhorn-system │ DaemonSet/engine-image-ei-75a03ec3                    │   3   │   31    │         │ 3       │    │    │
+│ longhorn-system │ Deployment/csi-snapshotter                            │   1   │   6     │         │ 3       │    │    │
+│ longhorn-system │ Pod/instance-manager-5768fba6145a92d443de7c9cc0e1c9f5 │   2   │   34    │         │ 4       │    │    │
+│ longhorn-system │ Pod/instance-manager-69591f8135e195a3e814269d7c41035c │   2   │   34    │         │ 4       │    │    │
+│ longhorn-system │ DaemonSet/longhorn-manager                            │   2   │   44    │         │ 5       │    │    │
+│ longhorn-system │ Deployment/csi-resizer                                │   1   │   7     │         │ 3       │    │    │
+│ longhorn-system │ Deployment/longhorn-ui                                │       │   15    │         │ 3       │    │    │
+│ longhorn-system │ Deployment/longhorn-driver-deployer                   │   2   │   50    │         │ 2       │    │    │
+│ longhorn-system │ Deployment/csi-attacher                               │   1   │   7     │         │ 3       │    │    │
+└─────────────────┴───────────────────────────────────────────────────────┴───────┴─────────┴─────────┴─────────┴────┴────┘
+Severities: C=CRITICAL H=HIGH
+
+
+Infra Assessment
+┌─────────────┬───────────────────────────────────┬─────────────────┬───────────────────┬─────────┐
+│  Namespace  │             Resource              │ Vulnerabilities │ Misconfigurations │ Secrets │
+│             │                                   ├───────┬─────────┼─────────┬─────────┼────┬────┤
+│             │                                   │   C   │   H     │    C    │    H    │ C  │ H  │
+├─────────────┼───────────────────────────────────┼───────┼─────────┼─────────┼─────────┼────┼────┤
+│ kube-system │ Deployment/local-path-provisioner │   2   │   14    │         │ 3       │    │    │
+│ kube-system │ Deployment/metrics-server         │   2   │   8     │         │ 1       │    │    │
+│ kube-system │ Deployment/traefik                │       │   10    │         │         │    │    │
+│ kube-system │ Job/helm-install-traefik          │   3   │         │         │         │    │    │
+│ kube-system │ Job/helm-install-traefik-crd      │   3   │         │         │         │    │    │
+│ kube-system │ DaemonSet/svclb-traefik-75444746  │   4   │   20    │         │ 6       │    │    │
+│ kube-system │ Deployment/coredns                │   1   │   15    │         │ 1       │    │    │
+└─────────────┴───────────────────────────────────┴───────┴─────────┴─────────┴─────────┴────┴────┘
+Severities: C=CRITICAL H=HIGH
+
+
+RBAC Assessment
+┌─────────────────┬──────────────────────────────────────────────────────────────┬─────────────────┐
+│    Namespace    │                           Resource                           │ RBAC Assessment │
+│                 │                                                              ├────────┬────────┤
+│                 │                                                              │   C    │   H    │
+├─────────────────┼──────────────────────────────────────────────────────────────┼────────┼────────┤
+│ longhorn-system │ Role/longhorn                                                │   5    │ 2      │
+│                 │ ClusterRole/system:aggregate-to-edit                         │   2    │ 4      │
+│                 │ ClusterRole/admin                                            │   2    │ 4      │
+│                 │ ClusterRole/system:controller:horizontal-pod-autoscaler      │   2    │        │
+│                 │ ClusterRole/system:kube-controller-manager                   │   5    │        │
+│                 │ ClusterRole/system:controller:endpoint-controller            │        │ 1      │
+│                 │ ClusterRole/edit                                             │   2    │ 4      │
+│                 │ ClusterRole/k3s-cloud-controller-manager                     │   1    │ 1      │
+│                 │ ClusterRole/local-path-provisioner-role                      │   1    │ 1      │
+│                 │ ClusterRole/system:controller:endpointslice-controller       │        │ 1      │
+│                 │ ClusterRole/system:controller:generic-garbage-collector      │   1    │        │
+│                 │ ClusterRole/system:node                                      │   1    │        │
+│                 │ ClusterRole/cluster-admin                                    │   2    │        │
+│                 │ ClusterRole/longhorn-role                                    │   3    │        │
+│                 │ ClusterRole/system:controller:resourcequota-controller       │   1    │        │
+│                 │ ClusterRole/system:controller:endpointslicemirroring-contro- │        │ 1      │
+│                 │ ller                                                         │        │        │
+│                 │ ClusterRole/system:controller:legacy-service-account-token-- │   1    │        │
+│                 │ cleaner                                                      │        │        │
+│                 │ ClusterRole/system:controller:namespace-controller           │   1    │        │
+│                 │ ClusterRole/traefik-kube-system                              │   1    │        │
+└─────────────────┴──────────────────────────────────────────────────────────────┴────────┴────────┘
+Severities: C=CRITICAL H=HIGH
+

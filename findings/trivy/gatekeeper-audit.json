@@ -1,0 +1,342 @@
+=== K8sPSPPrivilegedContainer ===
+[
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-manager' is not allowed",
+    "name": "longhorn-manager-mxt7f",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-manager' is not allowed",
+    "name": "longhorn-manager-95kfg",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-manager' is not allowed",
+    "name": "longhorn-manager-4gtff",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'node-driver-registrar' is not allowed",
+    "name": "longhorn-csi-plugin-qgmlm",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-csi-plugin' is not allowed",
+    "name": "longhorn-csi-plugin-qgmlm",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'node-driver-registrar' is not allowed",
+    "name": "longhorn-csi-plugin-gscdl",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-csi-plugin' is not allowed",
+    "name": "longhorn-csi-plugin-gscdl",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'node-driver-registrar' is not allowed",
+    "name": "longhorn-csi-plugin-4wd4p",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'longhorn-csi-plugin' is not allowed",
+    "name": "longhorn-csi-plugin-4wd4p",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'instance-manager' is not allowed",
+    "name": "instance-manager-69591f8135e195a3e814269d7c41035c",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'instance-manager' is not allowed",
+    "name": "instance-manager-5768fba6145a92d443de7c9cc0e1c9f5",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'instance-manager' is not allowed",
+    "name": "instance-manager-1c877faf45d6ad64d2d8b6eacb4ac383",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'engine-image-ei-75a03ec3' is not allowed",
+    "name": "engine-image-ei-75a03ec3-xl2xd",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'engine-image-ei-75a03ec3' is not allowed",
+    "name": "engine-image-ei-75a03ec3-sd299",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Privileged container 'engine-image-ei-75a03ec3' is not allowed",
+    "name": "engine-image-ei-75a03ec3-58gbp",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  }
+]
+=== K8sRequiredResourceLimits ===
+[
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'nextcloud-cron' must specify resources.limits.memory",
+    "name": "nextcloud-5895b5d7fc-2xnh2",
+    "namespace": "storage",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'nextcloud-cron' must specify resources.limits.cpu",
+    "name": "nextcloud-5895b5d7fc-2xnh2",
+    "namespace": "storage",
+    "version": "v1"
+  }
+]
+=== K8sAllowedRepos ===
+[
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'longhorn-liveness-probe' image 'docker.io/longhornio/livenessprobe:v2.18.0' is not from an allowed registry",
+    "name": "longhorn-csi-plugin-4wd4p",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'longhorn-csi-plugin' image 'docker.io/longhornio/longhorn-manager:v1.11.1' is not from an allowed registry",
+    "name": "longhorn-csi-plugin-4wd4p",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'instance-manager' image 'docker.io/longhornio/longhorn-instance-manager:v1.11.1' is not from an allowed registry",
+    "name": "instance-manager-69591f8135e195a3e814269d7c41035c",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'instance-manager' image 'docker.io/longhornio/longhorn-instance-manager:v1.11.1' is not from an allowed registry",
+    "name": "instance-manager-5768fba6145a92d443de7c9cc0e1c9f5",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'instance-manager' image 'docker.io/longhornio/longhorn-instance-manager:v1.11.1' is not from an allowed registry",
+    "name": "instance-manager-1c877faf45d6ad64d2d8b6eacb4ac383",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'engine-image-ei-75a03ec3' image 'docker.io/longhornio/longhorn-engine:v1.11.1' is not from an allowed registry",
+    "name": "engine-image-ei-75a03ec3-xl2xd",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'engine-image-ei-75a03ec3' image 'docker.io/longhornio/longhorn-engine:v1.11.1' is not from an allowed registry",
+    "name": "engine-image-ei-75a03ec3-sd299",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'engine-image-ei-75a03ec3' image 'docker.io/longhornio/longhorn-engine:v1.11.1' is not from an allowed registry",
+    "name": "engine-image-ei-75a03ec3-58gbp",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-snapshotter' image 'docker.io/longhornio/csi-snapshotter:v8.5.0' is not from an allowed registry",
+    "name": "csi-snapshotter-559c9d464b-pgl5p",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-snapshotter' image 'docker.io/longhornio/csi-snapshotter:v8.5.0' is not from an allowed registry",
+    "name": "csi-snapshotter-559c9d464b-7jp6r",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-snapshotter' image 'docker.io/longhornio/csi-snapshotter:v8.5.0' is not from an allowed registry",
+    "name": "csi-snapshotter-559c9d464b-5v6j6",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-resizer' image 'docker.io/longhornio/csi-resizer:v2.1.0' is not from an allowed registry",
+    "name": "csi-resizer-64c678dd69-h9rpz",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-resizer' image 'docker.io/longhornio/csi-resizer:v2.1.0' is not from an allowed registry",
+    "name": "csi-resizer-64c678dd69-cdprn",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-resizer' image 'docker.io/longhornio/csi-resizer:v2.1.0' is not from an allowed registry",
+    "name": "csi-resizer-64c678dd69-9cg57",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-provisioner' image 'docker.io/longhornio/csi-provisioner:v5.3.0-20260225' is not from an allowed registry",
+    "name": "csi-provisioner-6d744bccdf-znxql",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-provisioner' image 'docker.io/longhornio/csi-provisioner:v5.3.0-20260225' is not from an allowed registry",
+    "name": "csi-provisioner-6d744bccdf-tw6st",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-provisioner' image 'docker.io/longhornio/csi-provisioner:v5.3.0-20260225' is not from an allowed registry",
+    "name": "csi-provisioner-6d744bccdf-4tr8c",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-attacher' image 'docker.io/longhornio/csi-attacher:v4.11.0' is not from an allowed registry",
+    "name": "csi-attacher-589b76ddcb-w686s",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-attacher' image 'docker.io/longhornio/csi-attacher:v4.11.0' is not from an allowed registry",
+    "name": "csi-attacher-589b76ddcb-cdwlv",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  },
+  {
+    "enforcementAction": "deny",
+    "group": "",
+    "kind": "Pod",
+    "message": "Container 'csi-attacher' image 'docker.io/longhornio/csi-attacher:v4.11.0' is not from an allowed registry",
+    "name": "csi-attacher-589b76ddcb-7s98s",
+    "namespace": "longhorn-system",
+    "version": "v1"
+  }
+]
