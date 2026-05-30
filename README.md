@@ -14,9 +14,9 @@ This repo is structured as a self-paced lab. Each phase is independently runnabl
 | 04 — Supply chain | ✅ Complete | Trivy scans + OPA Gatekeeper admission policies |
 | 05 — Runtime security | ✅ Complete | Falco runtime detection shipped to Security Onion |
 | 06 — Network policy |  ✅ Complete | Default-deny NetworkPolicy with the existing CNI |
-| 07 — Posture / hardening | 📋 In-Progress | kube-bench + Kubescape baselines |
-| 08 — CSPM scan | 📋 Planned (lite) | Prowler against a small misconfigured AWS environment |
-| 09 — ATT&CK coverage | 📋 Planned | Detection-to-TTP mapping for what we built |
+| 07 — Posture / hardening | ✅ Complete | kube-bench + Kubescape baselines |
+| 08 — CSPM scan | 📋 In-Progress (lite) | Prowler against a small misconfigured AWS environment |
+| 09 — ATT&CK coverage | 📋 In-Progress | Detection-to-TTP mapping for what we built |
 | 10 — IR runbook | 📋 Planned | Incident response playbook for one scenario |
 
 Phases 03 (Keycloak/Vault), the full Cilium swap of phase 06, and the full Terraform stack of phase 08 are deferred — see the rationale in each phase doc.
