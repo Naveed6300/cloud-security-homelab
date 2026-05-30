@@ -1,0 +1,71 @@
+
+
+──────────────────────────────────────────────────
+
+Framework scanned: NSA
+
+╭─────────────────┬────╮
+│        Controls │ 26 │
+│          Passed │ 6  │
+│          Failed │ 15 │
+│ Action Required │ 5  │
+╰─────────────────┴────╯
+
+Failed resources by severity:
+
+╭──────────┬─────╮
+│ Critical │ 0   │
+│     High │ 44  │
+│   Medium │ 112 │
+│      Low │ 20  │
+╰──────────┴─────╯
+
+Run with '--verbose'/'-v' to see control failures for each resource.
+
+╭──────────┬────────────────────────────────────────────────────┬──────────────────┬───────────────┬────────────────────╮
+│ Severity │ Control name                                       │ Failed resources │ All Resources │ Compliance score   │
+├──────────┼────────────────────────────────────────────────────┼──────────────────┼───────────────┼────────────────────┤
+│ Critical │ Disable anonymous access to Kubelet service        │         0        │       0       │ Action Required ** │
+│ Critical │ Enforce Kubelet client TLS authentication          │         0        │       0       │ Action Required ** │
+│   High   │ Applications credentials in configuration files    │         2        │       53      │         96%        │
+│   High   │ Insecure capabilities                              │         2        │       27      │         93%        │
+│   High   │ Privileged container                               │         6        │       27      │         78%        │
+│   High   │ Ensure CPU limits are set                          │        18        │       27      │         33%        │
+│   High   │ Ensure memory limits are set                       │        16        │       27      │         41%        │
+│  Medium  │ Prevent containers from allowing command execution │         3        │       83      │         96%        │
+│  Medium  │ Non-root containers                                │        20        │       27      │         26%        │
+│  Medium  │ Allow privilege escalation                         │        18        │       27      │         33%        │
+│  Medium  │ Ingress and Egress blocked                         │        22        │       34      │         35%        │
+│  Medium  │ Automatic mapping of service account               │        24        │       86      │         72%        │
+│  Medium  │ Administrative Roles                               │         3        │       83      │         96%        │
+│  Medium  │ Container hostPort                                 │         1        │       27      │         96%        │
+│  Medium  │ Cluster internal networking                        │         4        │       9       │         56%        │
+│  Medium  │ Linux hardening                                    │        17        │       27      │         37%        │
+│  Medium  │ Secret/etcd encryption enabled                     │         0        │       0       │  Action Required * │
+│  Medium  │ Audit logs enabled                                 │         0        │       0       │  Action Required * │
+│    Low   │ Immutable container filesystem                     │        20        │       27      │         26%        │
+│    Low   │ PSP enabled                                        │         0        │       0       │  Action Required * │
+├──────────┼────────────────────────────────────────────────────┼──────────────────┼───────────────┼────────────────────┤
+│          │                  Resource Summary                  │        54        │      211      │       58.27%       │
+╰──────────┴────────────────────────────────────────────────────┴──────────────────┴───────────────┴────────────────────╯
+
+🚨 * failed to get cloud provider, cluster: default
+🚨 ** This control is scanned exclusively by the Kubescape operator, not the Kubescape CLI. Install the Kubescape operator:
+     https://kubescape.io/docs/install-operator/.
+
+────────────────────────────────────────────────────────────────────────────────
+Scan Coverage Warning
+────────────────────────────────────────────────────────────────────────────────
+
+The following resource types could not be collected:
+  • container.googleapis.com/v1/ClusterDescribe: failed to get cloud provider, cluster: default
+  • eks.amazonaws.com/v1/ClusterDescribe: failed to get cloud provider, cluster: default
+  • hostdata.kubescape.cloud/v1beta0/KubeletInfo: This control is scanned exclusively by the Kubescape operator, not the Kubescape CLI. Install the Kubescape operator:
+     https://kubescape.io/docs/install-operator/.
+  • management.azure.com/v1/ClusterDescribe: failed to get cloud provider, cluster: default
+
+The following controls were NOT evaluated (all required resource types failed to pull):
+  • C-0069 (missing: hostdata.kubescape.cloud/v1beta0/KubeletInfo)
+  • C-0070 (missing: hostdata.kubescape.cloud/v1beta0/KubeletInfo)
+
+To fix this, ensure the scanning identity has list/get permissions on the missing resource types.

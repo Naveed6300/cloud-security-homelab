@@ -1,13 +1,10 @@
 # Nextcloud Helm values — committable defaults. Secrets go in nextcloud-secrets.yaml (gitignored).
 # Chart docs: https://github.com/nextcloud/helm/tree/main/charts/nextcloud
-
 image:
   repository: nextcloud
   tag: 30-apache
   pullPolicy: IfNotPresent
-
 replicaCount: 1
-
 ingress:
   enabled: true
   className: traefik
@@ -18,13 +15,11 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
 # All Nextcloud config under ONE top-level key — no duplicates
 nextcloud:
   host: nextcloud.lab.home.arpa
   username: admin
   # password set in nextcloud-secrets.yaml override
-
   configs:
     custom.config.php: |-
       <?php
@@ -38,7 +33,6 @@ nextcloud:
         'logfile' => '/var/www/html/data/nextcloud.log',
         'loglevel' => 1,
       ];
-
   # The S3 / MinIO primary object backend — this is the critical wiring.
   # Files uploaded by users will land in MinIO, not on the local PVC.
   objectStore:
@@ -52,11 +46,26 @@ nextcloud:
       usePathStyle: true                      # required for MinIO (AWS S3 wants virtual-host)
       region: "us-east-1"                     # MinIO ignores this but the SDK requires it
       # key and secret set in nextcloud-secrets.yaml override
-
+  # Pod-level securityContext (apache needs to start as root, so no runAsNonRoot here)
+  podSecurityContext:
+    fsGroup: 33
+  # Container-level securityContext — F-008/F-011 hardening
+  # Apache starts as root then drops to www-data, so it needs CHOWN/SETUID/SETGID/DAC_OVERRIDE
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+      add:
+        - CHOWN
+        - SETUID
+        - SETGID
+        - DAC_OVERRIDE
+    seccompProfile:
+      type: RuntimeDefault
 # Use the Postgres we deployed in step 2 — disable the chart's bundled DB
 internalDatabase:
   enabled: false
-
 externalDatabase:
   enabled: true
   type: postgresql
@@ -64,7 +73,6 @@ externalDatabase:
   user: nextcloud
   database: nextcloud
   # password set in nextcloud-secrets.yaml override
-
 # Persistence is for Nextcloud's own configs and PHP session data.
 # Actual user files live in MinIO via the objectStore block above.
 persistence:
@@ -72,13 +80,19 @@ persistence:
   storageClass: local-path
   size: 5Gi
   accessMode: ReadWriteOnce
-
+# Cron runs as a sidecar container — needs resource limits for Gatekeeper
 cronjob:
   enabled: true
-
-podSecurityContext:
-  fsGroup: 33
-
+  type: sidecar
+  sidecar:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+# Main nextcloud container resources
 resources:
   requests:
     memory: 512Mi

@@ -38,10 +38,20 @@ spec:
       securityContext:
         # postgres image runs as uid 70 inside the container; this is set so the volume is owned correctly
         fsGroup: 70
+        runAsUser: 70
+        runAsGroup: 70
+        runAsNonRoot: true
       containers:
         - name: postgres
-          image: postgres:16-alpine
+          image: docker.io/library/postgres:16-alpine
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - containerPort: 5432
               name: postgres

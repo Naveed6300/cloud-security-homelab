@@ -16,7 +16,7 @@ spec:
   parameters:
     registries:
       - "docker.io/library/"
-      - "docker.io/nextcloud/"
+      - "docker.io/nextcloud"
       - "docker.io/bitnami/"
       - "docker.io/falcosecurity/"
       - "docker.io/redis/"
