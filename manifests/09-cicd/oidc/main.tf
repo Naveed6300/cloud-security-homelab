@@ -95,9 +95,19 @@ resource "aws_iam_policy" "github_actions_permissions" {
           "s3:PutEncryptionConfiguration",
           "s3:GetBucketPublicAccessBlock",
           "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketPolicy",
+          "s3:GetBucketAcl",
+          "s3:GetBucketCORS",
+          "s3:GetBucketWebsite",
+          "s3:GetBucketLogging",
+          "s3:GetLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:GetBucketRequestPayment",
+          "s3:GetAccelerateConfiguration",
+          "s3:GetBucketTagging",
           "s3:CreateBucket",
-          "s3:DeleteBucket",
-          "s3:GetBucketPolicy"
+          "s3:DeleteBucket"
         ]
 
         Resource = [
