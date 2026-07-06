@@ -22,6 +22,6 @@ terraform {
 
 provider "aws" {
 
-  region  = "us-east-1"
-  profile = "lab-deploy"
+  region = "us-east-1"
+
 }
