@@ -1,52 +1,54 @@
-
 name: Terraform
 
 on:
-	pull_request:
-		paths:
-			- 'manifests/09-cicd/app/**'
-	push:
-		branches: [main]
-		paths:
-			- 'manifests/09-cicd/app/**'
+  pull_request:
+    paths:
+      - 'manifests/09-cicd/app/**'
+  push:
+    branches: [main]
+    paths:
+      - 'manifests/09-cicd/app/**'
 
 permissions:
-	id-token: 	write
-	contents: 	read
-	pull-requests:	write
-
+  id-token: write
+  contents: read
+  pull-requests: write
 
 jobs:
-	terraform:
-		runs-on: ubuntu-latest
-		defaults:
-			run:
-				working-directory: manifests/09-cicd/app
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: manifests/09-cicd/app
 
-	steps:
-		- name: Checkout
-	 	  uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-		- name: Configure AWS credentials via OIDC
-		  uses: aws-actions/configure-aws-credentials@v4
-		  with:
-			role-to-assume: arn:aws:iam::435059220335:role/github-actions-deploy
-			aws-region:	us-east-1
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::435059220335:role/github-actions-deploy
+          aws-region: us-east-1
 
-		- name: Setup Terraform
-		  uses: hashicorp/setup-terraform@v3
-		  with:
-			terraform_version: "~1.15"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.15"
 
-		- name: Terraform Format Check
-		  run:  terraform fmt -check
+      - name: Terraform Format Check
+        run: terraform fmt -check
 
-		- name: Terraform init
-	          run:  terraform init
+      - name: Terraform Init
+        run: terraform init
 
-		- name: Terraform Validate
-		  run:  terraform validate
+      - name: Terraform Validate
+        run: terraform validate
 
-		- name: Terraform Apply
-		  if:   github.event_name == 'push' && github.ref == 'refs/heads/main'
-		  run:  terraform apply -auto-approve	
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
