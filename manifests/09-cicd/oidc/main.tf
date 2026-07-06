@@ -32,7 +32,10 @@ resource "aws_iam_role" "github_actions_deploy" {
           }
 
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:Naveed6300/cloud-security-homelab:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:Naveed6300/cloud-security-homelab:ref:refs/heads/main",
+              "repo:Naveed6300/cloud-security-homelab:pull_request"
+            ]
           }
         }
       }
@@ -93,7 +96,8 @@ resource "aws_iam_policy" "github_actions_permissions" {
           "s3:GetBucketPublicAccessBlock",
           "s3:PutBucketPublicAccessBlock",
           "s3:CreateBucket",
-          "s3:DeleteBucket"
+          "s3:DeleteBucket",
+          "s3:GetBucketPolicy"
         ]
 
         Resource = [
